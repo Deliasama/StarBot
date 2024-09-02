@@ -12,8 +12,6 @@ import de.delia.starBot.features.stars.tables.*;
 import de.delia.starBot.listeners.GuildReadyListener;
 import de.delia.starBot.listeners.MessageListener;
 import de.delia.starBot.listeners.SlashCommandInteractionListener;
-import de.delia.starBot.users.commands.ProfileCommand;
-import de.delia.starBot.users.tables.Clara4UserTable;
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
@@ -24,9 +22,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class Bot {
@@ -37,7 +33,6 @@ public class Bot {
     public final CommandManager commandManager;
     public final EntityManagerFactory entityManagerFactory;
 
-    public Clara4UserTable clara4UserTable;
     public StarProfileTable starProfileTable;
     public DailyTable dailyTable;
     public StockHistory.StockHistoryTable stockHistoryTable;
@@ -63,7 +58,6 @@ public class Bot {
         commandManager = new CommandManager(this);
 
         commandManager.registerCommand(TestCommand.class);
-        commandManager.registerCommand(ProfileCommand.class);
         commandManager.registerCommand(StatusCommand.class);
 
         // Stars
@@ -87,7 +81,6 @@ public class Bot {
             System.out.println("Datenbank fehler!");
             return;
         }
-        clara4UserTable = new Clara4UserTable();
         starProfileTable = new StarProfileTable();
         dailyTable = new DailyTable();
         stockTable = new Stock.StockTable();
