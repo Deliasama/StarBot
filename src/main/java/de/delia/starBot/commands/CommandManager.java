@@ -44,7 +44,11 @@ public class CommandManager {
         System.out.println("Registering command " + name + " " + description);
 
         if (applicationCommands.containsKey(name)) return;
-        applicationCommands.put(name, new Command<T>(name, description, clazz, null, this));
+        try {
+            applicationCommands.put(name, new Command<T>(name, description, clazz, null, this));
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public void upsertCommands(Guild guild) {

@@ -16,16 +16,20 @@ public class CustomButton extends ListenerAdapter {
         if(clickMethod != null)jda.addEventListener(this);
     }
 
-    private void handle(ButtonInteractionEvent event, String metaData) {
+    public void handle(ButtonInteractionEvent event, String metaData) {
         if(clickMethod != null)clickMethod.accept(event, metaData);
     }
 
-    private Button getButton() {
+    public Button getButton() {
         return button;
     }
 
-    private Button getButton(String metaData) {
+    public Button getButton(String metaData) {
         return button.withId(button.getId() + "_" + metaData);
+    }
+
+    public String getButtonId() {
+        return button.getId();
     }
 
     @Override

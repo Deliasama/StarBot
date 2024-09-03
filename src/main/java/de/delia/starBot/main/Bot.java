@@ -9,6 +9,7 @@ import de.delia.starBot.features.stars.listeners.ButtonInteractionListener;
 import de.delia.starBot.features.stars.menus.StarDropMenu;
 import de.delia.starBot.features.stars.listeners.MessageReceivedListener;
 import de.delia.starBot.features.stars.tables.*;
+import de.delia.starBot.guildConfig.ConfigCommand;
 import de.delia.starBot.listeners.GuildReadyListener;
 import de.delia.starBot.listeners.MessageListener;
 import de.delia.starBot.listeners.SlashCommandInteractionListener;
@@ -66,6 +67,8 @@ public class Bot {
         commandManager.registerCommand(DailyCommand.class);
         commandManager.registerCommand(RobCommand.class);
         commandManager.registerCommand(TradeCommand.class);
+
+        commandManager.registerCommand(ConfigCommand.class);
 
         jda.addEventListener(new MessageReceivedListener());
         starDropMenu = new StarDropMenu(jda);
