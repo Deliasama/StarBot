@@ -8,12 +8,22 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import java.util.function.BiConsumer;
 
 public class CustomButton extends ListenerAdapter {
-    private Button button;
+    private final Button button;
     private BiConsumer<ButtonInteractionEvent, String> clickMethod = null;
 
-    public CustomButton(Button button, JDA jda, BiConsumer<ButtonInteractionEvent, String> clickMethod) {
+    public CustomButton(Button button, BiConsumer<ButtonInteractionEvent, String> clickMethod) {
         this.button = button;
-        if(clickMethod != null)jda.addEventListener(this);
+        this.clickMethod = clickMethod;
+    }
+
+    public CustomButton addEventListener(JDA jda) {
+        jda.addEventListener(this);
+        return this;
+    }
+
+    public CustomButton removeEventListener(JDA jda) {
+        jda.removeEventListener(this);
+        return this;
     }
 
     public void handle(ButtonInteractionEvent event, String metaData) {

@@ -10,6 +10,7 @@ import de.delia.starBot.features.stars.menus.StarDropMenu;
 import de.delia.starBot.features.stars.listeners.MessageReceivedListener;
 import de.delia.starBot.features.stars.tables.*;
 import de.delia.starBot.guildConfig.ConfigCommand;
+import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.listeners.GuildReadyListener;
 import de.delia.starBot.listeners.MessageListener;
 import de.delia.starBot.listeners.SlashCommandInteractionListener;
@@ -18,6 +19,7 @@ import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
@@ -39,6 +41,7 @@ public class Bot {
     public StockHistory.StockHistoryTable stockHistoryTable;
     public Stock.StockTable stockTable;
     public Dividend.DividendTable dividendTable;
+    public GuildConfig.GuildConfigTable guildConfigTable;
 
     public Map<Long, TradeManager> tradeManagers = new HashMap<>();
 
@@ -77,6 +80,8 @@ public class Bot {
         jda.addEventListener(new SlashCommandInteractionListener());
         jda.addEventListener(new GuildReadyListener());
         jda.addEventListener(new ButtonInteractionListener());
+
+        System.out.println(jda.getInviteUrl(Permission.ADMINISTRATOR));
     }
 
     public void initTables() {
@@ -89,6 +94,8 @@ public class Bot {
         stockTable = new Stock.StockTable();
         stockHistoryTable = new StockHistory.StockHistoryTable();
         dividendTable = new Dividend.DividendTable();
+
+        guildConfigTable = new GuildConfig.GuildConfigTable();
 
     }
 
