@@ -2,6 +2,8 @@ package de.delia.starBot.features.stars.menus;
 
 import com.iwebpp.crypto.TweetNaclFast;
 import de.delia.starBot.features.stars.tables.StarProfile;
+import de.delia.starBot.features.stars.town.Building;
+import de.delia.starBot.features.stars.town.Telescope;
 import de.delia.starBot.menus.ButtonMenu;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -42,6 +44,9 @@ public class StarDropMenu extends ButtonMenu {
         if(event.getButton().getId().split(":")[1].equals("X")) {
             collected.put(event.getGuild().getIdLong(), true);
             int starsEarned = random.nextInt(21)+10;
+
+            Telescope telescope = (Telescope) Building.loadBuilding(Telescope.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
+            if(telescope != null) starsEarned = ((int) (((long) starsEarned) * (1.0 + ((long) telescope.getLevel() * 0.5))));
 
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTitle("Shooting Star!")

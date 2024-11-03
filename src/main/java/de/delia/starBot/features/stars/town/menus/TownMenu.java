@@ -1,0 +1,213 @@
+package de.delia.starBot.features.stars.town.menus;
+
+import de.delia.starBot.features.stars.town.Building;
+import de.delia.starBot.features.stars.town.TownHall;
+import de.delia.starBot.main.Main;
+import de.delia.starBot.menus.CacheableEmbedMenu;
+import de.delia.starBot.menus.EmbedMenu;
+import de.delia.starBot.menus.EmbedMenuInstance;
+import lombok.Getter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+public class TownMenu extends CacheableEmbedMenu {
+    private final BuildingMenu buildingMenu;
+
+    public TownMenu(JDA jda) {
+        super("town", null);
+        buildingMenu = new BuildingMenu(this);
+
+        addSubMenu(buildingMenu);
+
+        addEventListener(jda);
+    }
+
+    public EmbedBuilder getEmbed(Member member, Guild guild, Channel channel, List<Building> buildings) {
+        EmbedBuilder embedBuilder = new EmbedBuilder()
+                .setTitle("Town")
+                .setColor(Color.cyan)
+                .setAuthor(member.getUser().getName(), null, member.getUser().getAvatarUrl())
+                .setTimestamp(Instant.now());
+
+        for(Building building : buildings) {
+            embedBuilder.addField(building.getIcon().getFormatted() + " **" + building.getName() + "**", "Level: " + building.getLevel(), false);
+        }
+        return embedBuilder;
+    }
+
+    @Override
+    public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
+        if (!event.getSelectMenu().getId().startsWith(getId())) return;
+
+        if(event.getInteraction().getValues().isEmpty()) return;
+        String value = event.getInteraction().getValues().get(0);
+
+        TownMenuInstance<TownMenu> townMenuInstance = (TownMenuInstance<TownMenu>) getInstance(generateCacheKey(event.getMember(), event.getGuild()));
+        if(townMenuInstance == null || townMenuInstance.isExpired(Instant.now().getEpochSecond())) regenerate(event.getMember(), event.getGuild(), event.getChannel());
+        townMenuInstance = (TownMenuInstance<TownMenu>) getInstance(generateCacheKey(event.getMember(), event.getGuild()));
+
+        for (Building building : townMenuInstance.getBuildings()) {
+            if(building.getName().equals(value)) {
+                EmbedMenuResponse response = buildingMenu.generate(event.getMember(), event.getGuild(), event.getChannel());
+
+                List<ActionRow> actionRows = response.getActionRows();
+                List<ItemComponent> components = actionRows.get(0).getComponents();
+                components.add(Button.success(getId() + ":upgrade:" + building.getName(), Emoji.fromUnicode("U+23EB")));
+                actionRows.set(0, ActionRow.of(components));
+
+                actionRows.add(event.getMessage().getActionRows().get(0));
+
+                event.editMessageEmbeds(building.getEmbed()).setComponents(actionRows).queue();
+                return;
+            }
+        }
+    }
+
+    @Override
+    public EmbedMenuResponse generate(Member member, Guild guild, Channel channel) {
+        TownMenuInstance<TownMenu> townMenuInstance = (TownMenuInstance<TownMenu>) instanceCache.get(generateCacheKey(member, guild));
+
+        if (townMenuInstance != null && !townMenuInstance.isExpired(DEFAULT_CACHE_TTL)) {
+            List<Building> buildings = townMenuInstance.getBuildings();
+
+            EmbedBuilder embedBuilder = townMenuInstance.getEmbedBuilder();
+
+            StringSelectMenu.Builder selectMenu = StringSelectMenu.create(getId() + ":customNavigator");
+            selectMenu.setPlaceholder("navigate");
+            selectMenu.setMaxValues(1);
+
+            for(Building building : buildings) {
+                selectMenu.addOption(building.getName(), building.getClass().getName());
+            }
+
+            return new EmbedMenuResponse(embedBuilder.build(), Collections.singletonList(ActionRow.of(selectMenu.build())), channel, member, guild);
+        }
+
+        TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, guild.getIdLong(), member.getIdLong());
+
+        if(townHall == null) {
+            townHall = (TownHall) Building.create(TownHall.class, guild.getIdLong(), member.getIdLong());
+        }
+        if(townHall == null) return null;
+        if(townHall.getLevel() == 0) {
+            townHall.setLevel(1);
+            townHall.save();
+        }
+
+        List<Building> buildings = new ArrayList<>();
+        buildings.add(townHall);
+        buildings.addAll(townHall.getTown());
+
+        EmbedBuilder embedBuilder = getEmbed(member, guild, channel, buildings);
+
+        StringSelectMenu.Builder selectMenu = StringSelectMenu.create(getId() + ":customNavigator");
+        selectMenu.setPlaceholder("navigate");
+        selectMenu.setMaxValues(1);
+
+        for(Building building : buildings) {
+            selectMenu.addOption(building.getName(), building.getName());
+        }
+
+        newInstance(generateCacheKey(member, guild), new TownMenuInstance<>(this, member, guild, embedBuilder, Collections.singletonList(ActionRow.of(selectMenu.build())), Instant.now().getEpochSecond(), townHall, buildings));
+
+        return new EmbedMenuResponse(embedBuilder.build(), Collections.singletonList(ActionRow.of(selectMenu.build())), channel, member, guild);
+    }
+
+    public void onButtonInteraction(ButtonInteractionEvent event) {
+        if (event.getButton().getId().startsWith(getId() + ":upgrade")) {
+            String value = event.getButton().getId().split(":")[event.getButton().getId().split(":").length - 1];
+
+            EmbedMenuInstance<?> instance = getInstance(generateCacheKey(event.getMember(), event.getGuild()));
+            if(instance == null || instance.isExpired(Instant.now().getEpochSecond())) {
+                regenerate(event.getMember(), event.getGuild(), event.getChannel());
+                instance = getInstance(generateCacheKey(event.getMember(), event.getGuild()));
+            }
+
+            if(!(instance instanceof TownMenuInstance)) return;
+            TownMenuInstance<?> townMenuInstance = (TownMenuInstance<?>) instance;
+
+            for (Building building : townMenuInstance.getBuildings()) {
+                if(building.getName().equals(value)) {
+                    try {
+                        if(building.upgrade()) {
+                            event.reply(building.getName() + " is upgraded to level **" + building.getLevel() + "**").setEphemeral(true).queue();
+
+                            EmbedMenuResponse response = regenerate(event.getMember(), event.getGuild(), event.getChannel());
+
+                            event.getMessage().editMessageEmbeds(building.getEmbed()).queue();
+                        } else {
+                            event.reply("Something went wrong!").setEphemeral(true).queue();
+                        }
+                    } catch (Building.UpgradeFailedException e) {
+                        event.reply(e.getMessage()).setEphemeral(true).queue();
+                    }
+                }
+            }
+        }
+        super.onButtonInteraction(event);
+    }
+
+
+    @Getter
+    public static class TownMenuInstance <T extends TownMenu> extends EmbedMenuInstance<TownMenu> {
+        private final TownHall townHall;
+        private final List<Building> buildings;
+
+        public TownMenuInstance(TownMenu embedMenu, Member member, Guild guild, EmbedBuilder embedBuilder, List<ActionRow> actionRows, long timestamp, TownHall townHall, List<Building> buildings) {
+            super(embedMenu, member, guild, embedBuilder, actionRows, timestamp);
+            this.townHall = townHall;
+            this.buildings = buildings;
+        }
+    }
+
+
+    public static class BuildingMenu extends EmbedMenu {
+        public BuildingMenu(EmbedMenu parent) {
+            super("buildingMenu", parent);
+
+            this.addBackButton();
+        }
+
+        public StringSelectMenu getNavigator() {
+            return null;
+        }
+
+        @Override
+        public void onMenuButtonInteraction(MenuButtonInteractionEvent event) {
+            if(event == null)return;
+            if(event.getEvent().getButton().getId().equals(getId() + ":back")) return;
+            String[] args = event.getEvent().getButton().getId().split(":");
+            String name = args[args.length - 2];
+            try {
+                Class<? extends Building> type = (Class<? extends Building>) Class.forName(name);
+                Building building = Building.loadBuilding(type, event.getEvent().getGuild().getIdLong(), event.getEvent().getMember().getIdLong());
+
+                if(building == null) return;
+
+                building.onButtonInteraction(event.getEvent(), args[args.length - 1]);
+            } catch (ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+}

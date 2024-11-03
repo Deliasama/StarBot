@@ -2,6 +2,7 @@ package de.delia.starBot.features.stars.listeners;
 
 import de.delia.starBot.features.stars.TradeManager;
 import de.delia.starBot.features.stars.tables.StarProfile;
+import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.main.Main;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -14,6 +15,11 @@ public class ButtonInteractionListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
         if(event.getButton().getId().equalsIgnoreCase("stock.offer")) {
+            if(!GuildConfig.getGuildConfig(event.getGuild().getIdLong()).getConfig("enableStock", Boolean.class)) {
+                event.reply("The Stock System is disabled on this server!").setEphemeral(true).queue();
+                return;
+            }
+
             TradeManager tradeManager = Main.INSTANCE.tradeManagers.get(event.getGuild().getIdLong());
             if(tradeManager == null)return;
             if((tradeManager.getOfferMemberId()==null? 0L :tradeManager.getOfferMemberId()) == event.getUser().getIdLong()) {
@@ -58,6 +64,11 @@ public class ButtonInteractionListener extends ListenerAdapter {
     @Override
     public void onModalInteraction(ModalInteractionEvent event) {
         if(event.getModalId().equals("stock.offer.modal")) {
+            if(!GuildConfig.getGuildConfig(event.getGuild().getIdLong()).getConfig("enableStock", Boolean.class)) {
+                event.reply("The Stock System is disabled on this server!").setEphemeral(true).queue();
+                return;
+            }
+
             String input = event.getValue("stock.offer.value").getAsString();
             int offer = Integer.parseInt(input);
 

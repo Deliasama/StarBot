@@ -1,5 +1,6 @@
 package de.delia.starBot.features.stars.listeners;
 
+import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
@@ -26,11 +27,18 @@ public class MessageReceivedListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        // StarDrops
         if (event.getAuthor().isBot() || event.getChannel() instanceof PrivateChannel)return;
 
-        int index = this.index.getOrDefault(event.getGuild().getIdLong(), 0);
+        // check if starDrop is Enabled or if the channel is blacklisted
+        GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
+        if(!guildConfig.getConfig("enableStarDrop", Boolean.class))return;
+        if(guildConfig.getConfigList("starDropBlacklistedChannel", Long.class).contains(event.getChannel().getIdLong()))return;
+
+        int index = this.index.getOrDefault(event.getGuild().getIdLong(), getRandomIndex(guildConfig.getConfig("starDropMessageMin", Integer.class), guildConfig.getConfig("starDropMessageMax", Integer.class)));
         index--;
         if (index <= 0) {
+
             int r = random.nextInt(emojiList.size());
 
             EmbedBuilder embedBuilder = new EmbedBuilder()
@@ -48,12 +56,12 @@ public class MessageReceivedListener extends ListenerAdapter {
             }
             event.getChannel().sendMessageEmbeds(embedBuilder.build()).setActionRow(Main.INSTANCE.starDropMenu.getActionRow(ids)).queue();
 
-            index = getRandomIndex();
+            index = getRandomIndex(guildConfig.getConfig("starDropMessageMin", Integer.class), guildConfig.getConfig("starDropMessageMax", Integer.class));
         }
         this.index.put(event.getGuild().getIdLong(), index);
     }
 
-    private int getRandomIndex() {
-        return random.nextInt(30)+25;
+    private int getRandomIndex(int min, int max) {
+        return random.nextInt(max-min)+min;
     }
 }

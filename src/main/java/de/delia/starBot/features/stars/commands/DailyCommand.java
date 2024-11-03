@@ -4,6 +4,8 @@ import de.delia.starBot.commands.ApplicationCommand;
 import de.delia.starBot.commands.ApplicationCommandMethod;
 import de.delia.starBot.features.stars.tables.Daily;
 import de.delia.starBot.features.stars.tables.StarProfile;
+import de.delia.starBot.features.stars.town.Building;
+import de.delia.starBot.features.stars.town.TownHall;
 import de.delia.starBot.main.Bot;
 import de.delia.starBot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -39,7 +41,13 @@ public class DailyCommand {
 
             int dividendBonus = (int) (((float) dividendVolume) * share);
 
-            int starsEarned = 10 + daily.getStreak()-1 + dividendBonus;
+            TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
+            if(townHall==null) townHall = (TownHall) Building.create(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
+            if(townHall.getLevel()==0) {
+                townHall.setLevel(1);
+                townHall.save();
+            }
+            int starsEarned = (10*townHall.getLevel()) + ((daily.getStreak()-1)*townHall.getLevel()) + dividendBonus;
 
             starProfile.addStars(starsEarned);
             Daily.getTable().update(daily);

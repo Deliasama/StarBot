@@ -2,6 +2,7 @@ package de.delia.starBot.main;
 
 import de.delia.starBot.basics.TestCommand;
 import de.delia.starBot.commands.CommandManager;
+import de.delia.starBot.features.basics.InviteCommand;
 import de.delia.starBot.features.basics.StatusCommand;
 import de.delia.starBot.features.stars.TradeManager;
 import de.delia.starBot.features.stars.commands.*;
@@ -24,12 +25,14 @@ import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 public class Bot {
-    public String version = "24w33b";
+    public String version;
     public Instant startTime = Instant.now();
 
     public final JDA jda;
@@ -42,6 +45,7 @@ public class Bot {
     public Stock.StockTable stockTable;
     public Dividend.DividendTable dividendTable;
     public GuildConfig.GuildConfigTable guildConfigTable;
+    public BuildingEntity.BuildingTable buildingTable;
 
     public Map<Long, TradeManager> tradeManagers = new HashMap<>();
 
@@ -49,20 +53,33 @@ public class Bot {
     public StarDropMenu starDropMenu;
 
     public Bot(String token) {
+        // get Project version
+        final Properties properties = new Properties();
+        try {
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("version.properties"));
+            version = properties.getProperty("version");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("Project version: " + version);
 
+        // init Database
         entityManagerFactory = initDB();
 
+        // Create Discord JDA Instance
         jda = JDABuilder.createDefault(token)
                 .disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE)
                 .setBulkDeleteSplittingEnabled(false)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
-                .setActivity(Activity.playing("Bus verpassen"))
                 .build();
 
+        // Commands
         commandManager = new CommandManager(this);
 
         commandManager.registerCommand(TestCommand.class);
         commandManager.registerCommand(StatusCommand.class);
+        commandManager.registerCommand(ConfigCommand.class);
+        commandManager.registerCommand(InviteCommand.class);
 
         // Stars
         commandManager.registerCommand(StarsCommand.class);
@@ -70,8 +87,7 @@ public class Bot {
         commandManager.registerCommand(DailyCommand.class);
         commandManager.registerCommand(RobCommand.class);
         commandManager.registerCommand(TradeCommand.class);
-
-        commandManager.registerCommand(ConfigCommand.class);
+        commandManager.registerCommand(TownCommand.class);
 
         jda.addEventListener(new MessageReceivedListener());
         starDropMenu = new StarDropMenu(jda);
@@ -94,6 +110,7 @@ public class Bot {
         stockTable = new Stock.StockTable();
         stockHistoryTable = new StockHistory.StockHistoryTable();
         dividendTable = new Dividend.DividendTable();
+        buildingTable = new BuildingEntity.BuildingTable();
 
         guildConfigTable = new GuildConfig.GuildConfigTable();
 

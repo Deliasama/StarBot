@@ -4,6 +4,8 @@ import de.delia.starBot.commands.ApplicationCommand;
 import de.delia.starBot.commands.ApplicationCommandMethod;
 import de.delia.starBot.commands.Option;
 import de.delia.starBot.features.stars.tables.StarProfile;
+import de.delia.starBot.features.stars.town.Building;
+import de.delia.starBot.features.stars.town.Wall;
 import de.delia.starBot.main.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
@@ -38,6 +40,9 @@ public class RobCommand {
         StarProfile profileVictim = bot.starProfileTable.get(event.getGuild().getIdLong(), other.getIdLong());
 
         double r = ((double) random.nextInt(10)) / 100.0;
+
+        Wall wall = (Wall) Building.loadBuilding(Wall.class, event.getGuild().getIdLong(), other.getIdLong());
+        if(wall != null) r-= (((double) wall.getLevel())*0.005);
 
         int toSteal = (int) (profileVictim.getStars() * r);
 

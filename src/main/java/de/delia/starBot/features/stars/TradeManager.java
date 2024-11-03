@@ -243,8 +243,6 @@ public class TradeManager implements Runnable {
                 }
             });
 
-            minOffer = pricePerShare / membersOffer.size();
-
             StockHistory.getTable().save(new StockHistory(guildId, pricePerShare, Instant.now()));
 
             membersOffer.clear();
@@ -280,10 +278,6 @@ public class TradeManager implements Runnable {
         TimeSeries timeSeries = new TimeSeries("Time");
 
         List<StockHistory> stockHistories = StockHistory.getTable().getSorted(guildId, 21);
-
-        for(int i = 20; i > stockHistories.size(); i--) {
-            timeSeries.add(new Day(Date.from(Instant.now().minusSeconds((long) (i-1) *24*60*60))), 25+(i%2));
-        }
 
         for(StockHistory stockHistory : stockHistories) {
             timeSeries.add(new Day(Date.from(stockHistory.getTimestamp())), stockHistory.getValue());

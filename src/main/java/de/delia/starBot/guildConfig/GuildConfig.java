@@ -1,5 +1,7 @@
 package de.delia.starBot.guildConfig;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import de.delia.starBot.features.stars.tables.Dividend;
 import de.delia.starBot.main.Main;
 import jakarta.persistence.*;
@@ -7,6 +9,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.checkerframework.common.aliasing.qual.Unique;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,33 +21,33 @@ import java.util.Map;
 @Table(name = "GuildConfig")
 public class GuildConfig {
     public static final Map<Long, GuildConfig> bufferedConfigs = new HashMap<>();
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(unique = true, nullable = false)
     private Long guildId;
 
-    // Enable Stock system
-    @Column(nullable = false)
-    private boolean enableStock = false;
-
-    // Star Drops
-    @Column(nullable = false)
-    private boolean enableStarDrop = true;
-
-    @Column(nullable = false)
-    private int starDropMessageMin = 30;
-
-    @Column(nullable = false)
-    private int starDropMessageMax = 60;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "config", joinColumns = @JoinColumn(name = "guildConfig_id"))
+    @MapKeyColumn(name = "key")
+    @Column(name = "value")
+    Map<String, String> configs = new HashMap<>();
 
     public GuildConfig(Long guildId) {
         this.guildId = guildId;
+
+        this.configs.put("enableStock", String.valueOf(false));
+
+        this.configs.put("enableStarDrop", String.valueOf(true));
+        this.configs.put("starDropMessageMin", String.valueOf(30));
+        this.configs.put("starDropMessageMax", String.valueOf(60));
+        try {
+            this.configs.put("starDropBlacklistedChannel", objectMapper.writeValueAsString(new ArrayList<>()));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public static GuildConfig getConfig(long guildId) {
+    public static GuildConfig getGuildConfig(long guildId) {
         if(bufferedConfigs.containsKey(guildId)) {
             return bufferedConfigs.get(guildId);
         } else {
@@ -51,6 +55,32 @@ public class GuildConfig {
             bufferedConfigs.put(guildId, config);
             return config;
         }
+    }
+
+    public <T> List<T> getConfigList(String key, Class<T> type) {
+        if(!configs.containsKey(key))return null;
+        try {
+            return objectMapper.readValue(configs.get(key), objectMapper.getTypeFactory().constructCollectionType(List.class, type));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setConfigList(String key, List<?> value) {
+        try {
+            configs.put(key, objectMapper.writeValueAsString(value));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public <T> T getConfig(String key, Class<T> type) {
+        if(!configs.containsKey(key))return null;
+        return objectMapper.convertValue(configs.get(key), type);
+    }
+
+    public void setConfig(String key, String value) {
+        configs.put(key, value);
     }
 
     public GuildConfig update() {
@@ -80,12 +110,9 @@ public class GuildConfig {
         public GuildConfig update(GuildConfig guildConfig) {
             return getEntityManager(m -> {
                 m.getTransaction().begin();
-                GuildConfig c = m.find(GuildConfig.class, guildConfig.id);
+                GuildConfig c = m.find(GuildConfig.class, guildConfig.guildId);
 
-                c.enableStock = guildConfig.enableStock;
-                c.enableStarDrop = guildConfig.enableStarDrop;
-                c.starDropMessageMin = guildConfig.starDropMessageMin;
-                c.starDropMessageMax = guildConfig.starDropMessageMax;
+                c.configs = guildConfig.configs;
 
                 m.persist(c);
                 m.getTransaction().commit();

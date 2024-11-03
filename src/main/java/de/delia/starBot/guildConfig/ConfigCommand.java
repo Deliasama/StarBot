@@ -4,6 +4,7 @@ import de.delia.starBot.commands.ApplicationCommand;
 import de.delia.starBot.commands.ApplicationCommandMethod;
 import de.delia.starBot.commands.ApplicationCommandPermission;
 import de.delia.starBot.main.Bot;
+import de.delia.starBot.menus.EmbedMenu;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
@@ -21,6 +22,7 @@ public class ConfigCommand {
     public void onCommand(Bot bot, SlashCommandInteractionEvent event) {
         if(menu == null)menu = new GuildConfigMenu(bot.jda);
 
-        event.replyEmbeds(menu.getEmbed(event.getMember(), event.getGuild(), event.getChannel()).get().build()).addActionRow(menu.getNavigator()).setEphemeral(true).queue();
+        EmbedMenu.EmbedMenuResponse embedMenuResponse = menu.generate(event.getMember(), event.getGuild(), event.getChannel());
+        event.replyEmbeds(embedMenuResponse.getEmbed()).setComponents(embedMenuResponse.getActionRows()).setEphemeral(true).queue();
     }
 }
