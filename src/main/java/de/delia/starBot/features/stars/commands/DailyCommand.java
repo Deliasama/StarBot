@@ -35,11 +35,13 @@ public class DailyCommand {
             }
             daily.setLastCalled(Instant.now());
 
+            /*
             float share = starProfile.getShares() / ((float) Math.round((StarProfile.getTable().getSumShares(event.getGuild().getIdLong()))));
 
             int dividendVolume = Main.INSTANCE.dividendTable.get(event.getGuild().getIdLong()).getValue();
 
             int dividendBonus = (int) (((float) dividendVolume) * share);
+            */
 
             TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
             if(townHall==null) townHall = (TownHall) Building.create(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
@@ -47,7 +49,7 @@ public class DailyCommand {
                 townHall.setLevel(1);
                 townHall.save();
             }
-            int starsEarned = (10*townHall.getLevel()) + ((daily.getStreak()-1)*townHall.getLevel()) + dividendBonus;
+            int starsEarned = (10*townHall.getLevel()) + ((daily.getStreak()-1)*townHall.getLevel()); //+ dividendBonus;
 
             starProfile.addStars(starsEarned);
             Daily.getTable().update(daily);
@@ -57,7 +59,7 @@ public class DailyCommand {
                     .setColor(Color.cyan)
                     .setTitle("Daily")
                     .setTimestamp(Instant.now())
-                    .setDescription("Du hast **" + starsEarned + "** Sterne erhalten!\nStreak: **" + (daily.getStreak()-1) + "** :fire:\nDividend Bonus: **" + dividendBonus + "**:star:");
+                    .setDescription("Du hast **" + starsEarned + "** Sterne erhalten!\nStreak: **" + (daily.getStreak()-1) + "** :fire:");
 
             event.replyEmbeds(embedBuilder.build()).queue();
         } else {

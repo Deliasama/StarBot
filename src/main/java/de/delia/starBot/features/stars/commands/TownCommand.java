@@ -17,6 +17,6 @@ public class TownCommand {
     public void onCommand(Bot bot, SlashCommandInteractionEvent event) {
         if(menu == null)menu = new TownMenu(bot.jda);
         EmbedMenu.EmbedMenuResponse response = menu.generate(event.getMember(), event.getGuild(), event.getChannel());
-        event.replyEmbeds(response.getEmbed()).setComponents(response.getActionRows()).queue();
+        event.replyEmbeds(response.getEmbed()).setComponents(response.getActionRows()).setEphemeral(true).queue();
     }
 }

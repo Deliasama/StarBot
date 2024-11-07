@@ -75,7 +75,7 @@ public class TownMenu extends CacheableEmbedMenu {
                 components.add(Button.success(getId() + ":upgrade:" + building.getName(), Emoji.fromUnicode("U+23EB")));
                 actionRows.set(0, ActionRow.of(components));
 
-                actionRows.add(event.getMessage().getActionRows().get(0));
+                actionRows.add(ActionRow.of(getCustomNavigator(townMenuInstance.buildings)));
 
                 event.editMessageEmbeds(building.getEmbed()).setComponents(actionRows).queue();
                 return;
@@ -92,15 +92,7 @@ public class TownMenu extends CacheableEmbedMenu {
 
             EmbedBuilder embedBuilder = townMenuInstance.getEmbedBuilder();
 
-            StringSelectMenu.Builder selectMenu = StringSelectMenu.create(getId() + ":customNavigator");
-            selectMenu.setPlaceholder("navigate");
-            selectMenu.setMaxValues(1);
-
-            for(Building building : buildings) {
-                selectMenu.addOption(building.getName(), building.getClass().getName());
-            }
-
-            return new EmbedMenuResponse(embedBuilder.build(), Collections.singletonList(ActionRow.of(selectMenu.build())), channel, member, guild);
+            return new EmbedMenuResponse(embedBuilder.build(), Collections.singletonList(ActionRow.of(getCustomNavigator(buildings))), channel, member, guild);
         }
 
         TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, guild.getIdLong(), member.getIdLong());
@@ -120,6 +112,12 @@ public class TownMenu extends CacheableEmbedMenu {
 
         EmbedBuilder embedBuilder = getEmbed(member, guild, channel, buildings);
 
+        newInstance(generateCacheKey(member, guild), new TownMenuInstance<>(this, member, guild, embedBuilder, Collections.singletonList(ActionRow.of(getCustomNavigator(buildings))), Instant.now().getEpochSecond(), townHall, buildings));
+
+        return new EmbedMenuResponse(embedBuilder.build(), Collections.singletonList(ActionRow.of(getCustomNavigator(buildings))), channel, member, guild);
+    }
+
+    public StringSelectMenu getCustomNavigator(List<Building> buildings) {
         StringSelectMenu.Builder selectMenu = StringSelectMenu.create(getId() + ":customNavigator");
         selectMenu.setPlaceholder("navigate");
         selectMenu.setMaxValues(1);
@@ -128,9 +126,7 @@ public class TownMenu extends CacheableEmbedMenu {
             selectMenu.addOption(building.getName(), building.getName());
         }
 
-        newInstance(generateCacheKey(member, guild), new TownMenuInstance<>(this, member, guild, embedBuilder, Collections.singletonList(ActionRow.of(selectMenu.build())), Instant.now().getEpochSecond(), townHall, buildings));
-
-        return new EmbedMenuResponse(embedBuilder.build(), Collections.singletonList(ActionRow.of(selectMenu.build())), channel, member, guild);
+        return selectMenu.build();
     }
 
     public void onButtonInteraction(ButtonInteractionEvent event) {

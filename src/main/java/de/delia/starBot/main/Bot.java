@@ -88,6 +88,7 @@ public class Bot {
         commandManager.registerCommand(RobCommand.class);
         commandManager.registerCommand(TradeCommand.class);
         commandManager.registerCommand(TownCommand.class);
+        commandManager.registerCommand(Visit.class);
 
         jda.addEventListener(new MessageReceivedListener());
         starDropMenu = new StarDropMenu(jda);

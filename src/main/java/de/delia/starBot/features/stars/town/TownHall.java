@@ -13,8 +13,8 @@ import java.util.Map;
 public class TownHall extends Building {
 
     private static Map<Class<? extends Building>, Integer> buildingUnlockTable = Map.of(
-            Telescope.class, 1,
-            Wall.class, 1
+            Telescope.class, 2,
+            Wall.class, 2
     );
 
     public TownHall(BuildingEntity buildingEntity) {
