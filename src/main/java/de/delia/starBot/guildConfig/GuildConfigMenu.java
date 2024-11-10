@@ -82,7 +82,7 @@ public class GuildConfigMenu extends EmbedMenu {
 
                 EmbedBuilder embedBuilder = new EmbedBuilder()
                         .setAuthor(e.getMember().getEffectiveName(), null, e.getMember().getUser().getAvatarUrl())
-                        .setTitle("**Stars**")
+                        .setTitle("**StarDrops**")
                         .setColor(Color.CYAN)
                         .addField((guildConfig.getConfig("enableStarDrop", Boolean.class) ? ":green_circle:" : ":red_circle:") + " Enable StarDrops", "Enables Star Drops", false)
                         .addField(":gear: Star Drop rarity:", guildConfig.getConfig("starDropMessageMin", Integer.class) + "-" + guildConfig.getConfig("starDropMessageMax", Integer.class) + " messages", false)

@@ -30,6 +30,7 @@ public class GuildConfig {
     public GuildConfig(Long guildId) {
         this.guildId = guildId;
 
+        // Stock
         this.configs.put("enableStock", String.valueOf(false));
 
         this.configs.put("enableStarDrop", String.valueOf(true));
@@ -61,9 +62,27 @@ public class GuildConfig {
         }
     }
 
+    public List<?> getConfigList(Configs config) {
+        if (!configs.containsKey(config.id)) return null;
+
+        try {
+            return objectMapper.readValue(configs.get(config.id), objectMapper.getTypeFactory().constructCollectionType(List.class, config.type));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public void setConfigList(String key, List<?> value) {
         try {
             configs.put(key, objectMapper.writeValueAsString(value));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void setConfigList(Configs config, List<?> value) {
+        try {
+            configs.put(config.id, objectMapper.writeValueAsString(value));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -74,9 +93,16 @@ public class GuildConfig {
         return objectMapper.convertValue(configs.get(key), type);
     }
 
+    public Object getConfig(Configs config) {
+        if (!configs.containsKey(config.id)) return null;
+        return objectMapper.convertValue(configs.get(config.id), config.type);
+    }
+
     public void setConfig(String key, String value) {
         configs.put(key, value);
     }
+
+    public void setConfig(Configs config, String value) { configs.put(config.id, value); }
 
     public GuildConfig update() {
         return Main.INSTANCE.guildConfigTable.update(this);
