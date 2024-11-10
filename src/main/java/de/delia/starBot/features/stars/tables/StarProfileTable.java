@@ -17,7 +17,7 @@ public class StarProfileTable extends Table<StarProfile> {
                     .setParameter(1, guildId)
                     .setParameter(2, memberId)
                     .getResultList();
-            if(starProfiles.isEmpty()) {
+            if (starProfiles.isEmpty()) {
                 StarProfile starProfile = new StarProfile(guildId, memberId, 0, 0);
                 save(starProfile);
                 return starProfile;
@@ -32,7 +32,7 @@ public class StarProfileTable extends Table<StarProfile> {
                     .setParameter(1, guildId)
                     .setParameter(2, limit)
                     .getResultList();
-            return starProfiles==null ? new ArrayList<>() : starProfiles;
+            return starProfiles == null ? new ArrayList<>() : starProfiles;
         });
     }
 
@@ -47,7 +47,7 @@ public class StarProfileTable extends Table<StarProfile> {
             List<StarProfile> starProfiles = m.createQuery("SELECT u from StarProfile u where u.guildId = ?1 and u.shares>0", StarProfile.class)
                     .setParameter(1, guildId)
                     .getResultList();
-            return starProfiles==null ? new ArrayList<>() : starProfiles;
+            return starProfiles == null ? new ArrayList<>() : starProfiles;
         });
     }
 

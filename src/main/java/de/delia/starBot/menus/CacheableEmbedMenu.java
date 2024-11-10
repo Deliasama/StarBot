@@ -4,7 +4,6 @@ import de.delia.starBot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
@@ -13,8 +12,6 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +41,7 @@ public class CacheableEmbedMenu extends EmbedMenu {
         EmbedBuilder embed = getEmbed(member, guild, channel).orElse(new EmbedBuilder().setTitle("404 No menu found"));
         List<ActionRow> actionRows = getComponents();
         StringSelectMenu navigator = getNavigator();
-        if(navigator != null)actionRows.add(ActionRow.of(getNavigator()));
+        if (navigator != null) actionRows.add(ActionRow.of(getNavigator()));
         EmbedMenuResponse embedMenuResponse = new EmbedMenuResponse(embed.build(), actionRows, channel, member, guild);
 
         newInstance(id, new EmbedMenuInstance<>(this, member, guild, embed, actionRows, Instant.now().getEpochSecond()));

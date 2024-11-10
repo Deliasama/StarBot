@@ -4,8 +4,6 @@ import de.delia.starBot.main.Main;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,7 +12,7 @@ import java.util.Optional;
 @Entity
 @NoArgsConstructor
 @Table(name = "Buildings")
-public class BuildingEntity{
+public class BuildingEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -55,7 +53,7 @@ public class BuildingEntity{
                         .setParameter(2, memberId)
                         .setParameter(3, type)
                         .getResultList();
-                if(buildingEntities.isEmpty()) {
+                if (buildingEntities.isEmpty()) {
                     return Optional.empty();
                 }
                 return Optional.ofNullable(buildingEntities.get(0));

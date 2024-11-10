@@ -19,7 +19,7 @@ public class LeaderboardCommand {
     @ApplicationCommandMethod
     public void onCommand(Bot bot, SlashCommandInteractionEvent event, @Option(isRequired = false, description = "bis welchen Platz") Integer depth) {
         GuildConfig config = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
-        if(depth == null)depth = 10;
+        if (depth == null) depth = 10;
         List<StarProfile> starProfiles = StarProfile.getTable().getSorted(event.getGuild().getIdLong(), depth, "u.stars");
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
@@ -28,11 +28,11 @@ public class LeaderboardCommand {
                 .setColor(Color.cyan);
 
         StringBuilder stringBuilder = new StringBuilder();
-        for(int i = 1; i<=starProfiles.size(); i++) {
+        for (int i = 1; i <= starProfiles.size(); i++) {
             stringBuilder
                     .append("**#").append(i).append("** ").append(UserSnowflake.fromId(starProfiles.get(i - 1).getMemberId()).getAsMention()).append("\n")
                     .append(" - ").append(starProfiles.get(i - 1).getStars()).append("⭐");
-            if(config.getConfig("enableStock", Boolean.class)) {
+            if (config.getConfig("enableStock", Boolean.class)) {
                 stringBuilder.append(" - ").append(starProfiles.get(i - 1).getShares()).append(":scroll:");
             }
             stringBuilder.append("\n");

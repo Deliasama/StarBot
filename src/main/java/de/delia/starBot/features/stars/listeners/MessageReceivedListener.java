@@ -13,16 +13,12 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 import java.awt.*;
 import java.time.Instant;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class MessageReceivedListener extends ListenerAdapter {
-    Random random = new Random();
-    Map<Long, Integer> index = new HashMap<>();
-
     private final static List<Emoji> emojiList;
-
-    private static Map<String, Long> chatTimeout = new HashMap<>();
+    private static final Map<String, Long> chatTimeout = new HashMap<>();
 
     static {
         emojiList = new ArrayList<>();
@@ -31,13 +27,16 @@ public class MessageReceivedListener extends ListenerAdapter {
         emojiList.add(Emoji.fromUnicode("✨"));
     }
 
+    Random random = new Random();
+    Map<Long, Integer> index = new HashMap<>();
+
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         if (event.getAuthor().isBot() || event.getChannel() instanceof PrivateChannel) return;
 
         // Activity stars
         if (chatTimeout.containsKey(event.getGuild().getId() + event.getMember().getId())) {
-            if (!((Instant.now().getEpochSecond() - chatTimeout.get(event.getGuild().getId() + event.getMember().getId())) <= 5*60)) {
+            if (!((Instant.now().getEpochSecond() - chatTimeout.get(event.getGuild().getId() + event.getMember().getId())) <= 5 * 60)) {
                 addStars(event);
             }
         } else {
@@ -48,8 +47,9 @@ public class MessageReceivedListener extends ListenerAdapter {
         // StarDrops
         // check if starDrop is Enabled or if the channel is blacklisted
         GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
-        if(!guildConfig.getConfig("enableStarDrop", Boolean.class))return;
-        if(guildConfig.getConfigList("starDropBlacklistedChannel", Long.class).contains(event.getChannel().getIdLong()))return;
+        if (!guildConfig.getConfig("enableStarDrop", Boolean.class)) return;
+        if (guildConfig.getConfigList("starDropBlacklistedChannel", Long.class).contains(event.getChannel().getIdLong()))
+            return;
 
         int index = this.index.getOrDefault(event.getGuild().getIdLong(), getRandomIndex(guildConfig.getConfig("starDropMessageMin", Integer.class), guildConfig.getConfig("starDropMessageMax", Integer.class)));
         index--;
@@ -63,10 +63,10 @@ public class MessageReceivedListener extends ListenerAdapter {
                     .setDescription("Click " + emojiList.get(r).getFormatted() + " to collect it!");
 
             List<String> ids = new ArrayList<>();
-            for(int ii = 0; ii < 3; ii++) {
-                if(ii == r) {
+            for (int ii = 0; ii < 3; ii++) {
+                if (ii == r) {
                     ids.add("X");
-                }else {
+                } else {
                     ids.add("O");
                 }
             }
@@ -81,13 +81,13 @@ public class MessageReceivedListener extends ListenerAdapter {
         StarProfile starProfile = StarProfile.getTable().get(event.getGuild().getIdLong(), event.getMember().getIdLong());
         Telescope telescope = (Telescope) Building.loadBuilding(Telescope.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
         double multiplier = 1;
-        if(telescope != null) multiplier = 1.0 + (telescope.getLevel()*0.5);
+        if (telescope != null) multiplier = 1.0 + (telescope.getLevel() * 0.5);
         starProfile.addStars((int) (1.0 * Math.round(multiplier)));
 
         chatTimeout.put(event.getGuild().getId() + event.getMember().getId(), Instant.now().getEpochSecond());
     }
 
     private int getRandomIndex(int min, int max) {
-        return random.nextInt(max-min)+min;
+        return random.nextInt(max - min) + min;
     }
 }

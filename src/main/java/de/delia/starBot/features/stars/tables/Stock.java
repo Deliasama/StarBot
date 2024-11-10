@@ -15,27 +15,22 @@ import java.util.Map;
 @NoArgsConstructor
 @Table(name = "Stock")
 public class Stock {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column
-    private Long guildId;
-
-    @Column
-    private int price;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "members_sell", joinColumns = @JoinColumn(name = "stock_id"))
-    @Column(name = "member_id")
-    private List<Long> membersSell = new ArrayList<>();
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "members_offer", joinColumns = @JoinColumn(name = "stock_id"))
     @MapKeyColumn(name = "member_id")
     @Column(name = "offer")
     Map<Long, Integer> membersOffer = new HashMap<>();
-
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Column
+    private Long guildId;
+    @Column
+    private int price;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "members_sell", joinColumns = @JoinColumn(name = "stock_id"))
+    @Column(name = "member_id")
+    private List<Long> membersSell = new ArrayList<>();
     @Column
     private Long offerMemberId;
 
@@ -45,7 +40,7 @@ public class Stock {
     @Column
     private int phase;
 
-    public Stock(Long guildId, int price, List<Long> membersSell, Map<Long, Integer> membersOffer ,Long offerMemberId, int offerValue, int phase) {
+    public Stock(Long guildId, int price, List<Long> membersSell, Map<Long, Integer> membersOffer, Long offerMemberId, int offerValue, int phase) {
         this.guildId = guildId;
         this.price = price;
         this.membersSell = membersSell;
@@ -70,7 +65,7 @@ public class Stock {
                 List<Stock> stocks = m.createQuery("SELECT s from Stock s where s.guildId = ?1", Stock.class)
                         .setParameter(1, guildId)
                         .getResultList();
-                if(stocks.isEmpty()) {
+                if (stocks.isEmpty()) {
                     Stock stock = new Stock(guildId, 25, new ArrayList<>(), new HashMap<>(), null, 0, 0);
                     save(stock);
                     return stock;
@@ -84,7 +79,7 @@ public class Stock {
                 m.getTransaction().begin();
                 Stock s = m.find(Stock.class, stock.getId());
 
-                if(s == null)return null;
+                if (s == null) return null;
 
                 s.setPhase(stock.getPhase());
                 s.setGuildId(stock.getGuildId());

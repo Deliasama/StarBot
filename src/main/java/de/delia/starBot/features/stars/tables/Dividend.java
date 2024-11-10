@@ -46,7 +46,7 @@ public class Dividend {
                 List<Dividend> dividends = m.createQuery("SELECT d from Dividend d where d.guildId = ?1", Dividend.class)
                         .setParameter(1, guildId)
                         .getResultList();
-                if(dividends.isEmpty()) {
+                if (dividends.isEmpty()) {
                     Dividend dividend = new Dividend(guildId, 150, 0, 0);
                     save(dividend);
                     return dividend;
@@ -60,7 +60,7 @@ public class Dividend {
                 m.getTransaction().begin();
                 Dividend d = m.find(Dividend.class, dividend.getId());
 
-                if(d == null)return null;
+                if (d == null) return null;
 
                 d.setValue(dividend.getValue());
                 d.setTrendDay(dividend.getTrendDay());

@@ -46,7 +46,8 @@ public class CommandManager {
         if (applicationCommands.containsKey(name)) return;
         try {
             applicationCommands.put(name, new Command<T>(name, description, clazz, null, this));
-        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
+                 IllegalAccessException e) {
             throw new RuntimeException(e);
         }
     }

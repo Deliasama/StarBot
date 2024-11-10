@@ -12,30 +12,26 @@ import java.time.Instant;
 @NoArgsConstructor
 @Table(name = "Daily")
 public class Daily {
+    @Column
+    Instant lastCalled;
+    @Column
+    int streak;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column
     private Long guildId;
-
     @Column
     private Long memberId;
-
-    @Column
-    Instant lastCalled;
-
-    @Column
-    int streak;
-
-    public static DailyTable getTable() {
-        return Main.INSTANCE.dailyTable;
-    }
 
     public Daily(Long guildId, Long memberId, Instant lastCalled, int streak) {
         this.guildId = guildId;
         this.memberId = memberId;
         this.lastCalled = lastCalled;
         this.streak = streak;
+    }
+
+    public static DailyTable getTable() {
+        return Main.INSTANCE.dailyTable;
     }
 }

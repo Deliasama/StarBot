@@ -20,7 +20,7 @@ public class ConfigCommand {
 
     @ApplicationCommandMethod
     public void onCommand(Bot bot, SlashCommandInteractionEvent event) {
-        if(menu == null)menu = new GuildConfigMenu(bot.jda);
+        if (menu == null) menu = new GuildConfigMenu(bot.jda);
 
         EmbedMenu.EmbedMenuResponse embedMenuResponse = menu.generate(event.getMember(), event.getGuild(), event.getChannel());
         event.replyEmbeds(embedMenuResponse.getEmbed()).setComponents(embedMenuResponse.getActionRows()).setEphemeral(true).queue();

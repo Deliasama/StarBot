@@ -31,29 +31,26 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 public class TradeManager implements Runnable {
+    private final long guildId;
     // 1 = Closed; 2 = Sell Phase; 3 = Auction phase
     @Getter
     private int phase;
-
     @Getter
     private List<Long> membersSell;
-
     @Getter
     private Map<Long, Integer> membersOffer;
-
-    private final long guildId;
-    private int minOffer;
+    private final int minOffer;
     @Getter
     private int offerValue;
     @Getter
     private Long offerMemberId;
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     public TradeManager(Guild guild) {
         this.guildId = guild.getIdLong();
 
-        if(StockHistory.getTable().getSorted(guildId, 10).isEmpty()) {
+        if (StockHistory.getTable().getSorted(guildId, 10).isEmpty()) {
             StockHistory.getTable().save(new StockHistory(guildId, 25, Instant.now()));
         }
 
@@ -69,14 +66,14 @@ public class TradeManager implements Runnable {
         ZonedDateTime time = Instant.now().atZone(ZoneOffset.systemDefault());
         System.out.println(time.getHour());
 
-        if(time.getHour() < 6) {
-            if(phase != 1)switchPhase(1);
+        if (time.getHour() < 6) {
+            if (phase != 1) switchPhase(1);
         }
-        if(time.getHour() >= 6 && time.getHour() < 13) {
-            if(phase != 2)switchPhase(2);
+        if (time.getHour() >= 6 && time.getHour() < 13) {
+            if (phase != 2) switchPhase(2);
         }
-        if(time.getHour() >= 13) {
-            if(phase != 3)switchPhase(3);
+        if (time.getHour() >= 13) {
+            if (phase != 3) switchPhase(3);
         }
 
         ZonedDateTime nextHour = time.plusHours(1).truncatedTo(ChronoUnit.HOURS);
@@ -91,13 +88,13 @@ public class TradeManager implements Runnable {
                 .setTimestamp(Instant.now())
                 .setAuthor(member.getUser().getName(), member.getUser().getAvatarUrl(), member.getUser().getAvatarUrl());
 
-        if(getPhase() == 1) {
+        if (getPhase() == 1) {
             embedBuilder.setDescription(":red_circle: Markt ist im Moment geschlossen!\n:moneybag: Aktuelles Dividendenvolumen: **" + getDividend() + "**\n:alarm_clock: Öffnet wieder um **6**Uhr");
         }
-        if(getPhase() == 2) {
+        if (getPhase() == 2) {
             embedBuilder.setDescription(":green_circle: Markt ist geöffnet zum verkauf! \n:moneybag: Aktuelles Dividendenvolumen: **" + getDividend() + "**\n:alarm_clock: Auktion startet um **13**Uhr");
         }
-        if(getPhase() == 3) {
+        if (getPhase() == 3) {
             StringBuilder stringBuilder = new StringBuilder();
 
             int price = membersOffer.values().stream().mapToInt(integer -> integer).sum();
@@ -106,25 +103,25 @@ public class TradeManager implements Runnable {
                 float amountSell = getAmountToSell();
                 float shares = (((float) m.getValue()) / ((float) price)) * amountSell;
                 shares = Math.round(shares * 100.0f) / 100.0f;
-                int percent = (int) ((shares/amountSell)*100.0f);
+                int percent = (int) ((shares / amountSell) * 100.0f);
 
                 stringBuilder.append(UserSnowflake.fromId(m.getKey()).getAsMention() + ":\n").append("> " + m.getValue() + ":star: [" + percent + "%] [" + shares + ":scroll:]").append("\n");
             });
 
             embedBuilder.addField(":moneybag: Auktion:", stringBuilder.toString(), false);
-            embedBuilder.setDescription(":green_circle: Auktion ist geöffnet! \n:moneybag: Insgesamt geboten: **" +  membersOffer.values().stream().mapToInt(Integer::intValue).sum() + "**:star:!\n:chart_with_upwards_trend: Aktuelles Dividendenvolumen: **" + getDividend() + "**\n:scroll: Aktienanzahl: **" + getAmountToSell() + "**\n:alarm_clock: Auktion endet um **0**Uhr");
+            embedBuilder.setDescription(":green_circle: Auktion ist geöffnet! \n:moneybag: Insgesamt geboten: **" + membersOffer.values().stream().mapToInt(Integer::intValue).sum() + "**:star:!\n:chart_with_upwards_trend: Aktuelles Dividendenvolumen: **" + getDividend() + "**\n:scroll: Aktienanzahl: **" + getAmountToSell() + "**\n:alarm_clock: Auktion endet um **0**Uhr");
         }
         return embedBuilder;
     }
 
     public boolean sell(long memberId) {
-        if(phase != 2)return false;
+        if (phase != 2) return false;
 
         StarProfile profile = StarProfile.getTable().get(guildId, memberId);
 
-        if(membersSell.contains(memberId))return false;
-        if(profile == null) return false;
-        if(profile.getShares() < 1) return false;
+        if (membersSell.contains(memberId)) return false;
+        if (profile == null) return false;
+        if (profile.getShares() < 1) return false;
 
         profile.setShares(profile.getShares() - 1);
         membersSell.add(memberId);
@@ -135,16 +132,16 @@ public class TradeManager implements Runnable {
     }
 
     public boolean offer(long memberId, int offer) {
-        if(phase != 3)return false;
+        if (phase != 3) return false;
 
         StarProfile profile = StarProfile.getTable().get(guildId, memberId);
 
-        if(profile == null) return false;
-        if((profile.getStars() + membersOffer.getOrDefault(memberId, 0)) < offer)return false;
-        if(offer <= membersOffer.getOrDefault(memberId, 0))return false;
+        if (profile == null) return false;
+        if ((profile.getStars() + membersOffer.getOrDefault(memberId, 0)) < offer) return false;
+        if (offer <= membersOffer.getOrDefault(memberId, 0)) return false;
         // if(offerValue >= offer)return false;
 
-        if(offerMemberId != null) {
+        if (offerMemberId != null) {
             StarProfile lastOfferMember = StarProfile.getTable().get(guildId, offerMemberId);
             lastOfferMember.addStars(offerValue);
         }
@@ -180,31 +177,31 @@ public class TradeManager implements Runnable {
 
         // calculate new trends
         ZonedDateTime now = ZonedDateTime.now();
-        if(now.getHour() < 1) {
+        if (now.getHour() < 1) {
             // updates daily
-            if(random.nextDouble() < 0.75) {
-                if(dividend.getValue()<=200)dividend.setTrendDay(1);
-                if(dividend.getValue()>200)dividend.setTrendDay(-1);
+            if (random.nextDouble() < 0.75) {
+                if (dividend.getValue() <= 200) dividend.setTrendDay(1);
+                if (dividend.getValue() > 200) dividend.setTrendDay(-1);
             } else {
-                dividend.setTrendDay(random.nextInt(3)-1);
+                dividend.setTrendDay(random.nextInt(3) - 1);
             }
 
             // updates Weekly
-            if(now.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
-                if(random.nextDouble() < 0.75) {
-                    if(dividend.getValue()<=200)dividend.setTrendWeek(1);
-                    if(dividend.getValue()>200)dividend.setTrendWeek(-1);
+            if (now.getDayOfWeek().equals(DayOfWeek.MONDAY)) {
+                if (random.nextDouble() < 0.75) {
+                    if (dividend.getValue() <= 200) dividend.setTrendWeek(1);
+                    if (dividend.getValue() > 200) dividend.setTrendWeek(-1);
                 } else {
-                    dividend.setTrendWeek(random.nextInt(3)-1);
+                    dividend.setTrendWeek(random.nextInt(3) - 1);
                 }
             }
         }
 
 
         int value = dividend.getValue();
-        value+= (random.nextInt(5)-2);
-        value+= dividend.getTrendDay();
-        value+= dividend.getTrendWeek();
+        value += (random.nextInt(5) - 2);
+        value += dividend.getTrendDay();
+        value += dividend.getTrendWeek();
         dividend.setValue(value);
 
         Main.INSTANCE.dividendTable.update(dividend);
@@ -214,14 +211,14 @@ public class TradeManager implements Runnable {
 
     private void switchPhase(int newPhase) {
         this.phase = newPhase;
-        if(phase == 1) {
+        if (phase == 1) {
             System.out.println("Phase is now set to Closed!");
 
             int price = membersOffer.values().stream().mapToInt(integer -> integer).sum();
-            int amountSold = membersSell.size()+1;
+            int amountSold = membersSell.size() + 1;
             int pricePerShare = price / amountSold;
 
-            for(Long id : membersSell) {
+            for (Long id : membersSell) {
                 StarProfile p = StarProfile.getTable().get(guildId, id);
                 p.addStars(pricePerShare);
             }
@@ -236,8 +233,8 @@ public class TradeManager implements Runnable {
 
                 StarProfile p = StarProfile.getTable().get(guildId, id);
 
-                if(shares == 0)p.addStars(offer);
-                if(shares >= 0.1f) {
+                if (shares == 0) p.addStars(offer);
+                if (shares >= 0.1f) {
                     p.setShares(p.getShares() + shares);
                     StarProfile.getTable().update(p);
                 }
@@ -250,14 +247,14 @@ public class TradeManager implements Runnable {
             updateDB();
         }
 
-        if(phase == 2) {
+        if (phase == 2) {
             System.out.println("Phase is now set to Sell!");
             offerValue = minOffer;
             updateDB();
         }
-        if(phase == 3) {
+        if (phase == 3) {
             System.out.println("Phase is now set to Auction!");
-            offerValue =  minOffer * (membersSell.size()+1);
+            offerValue = minOffer * (membersSell.size() + 1);
             updateDB();
         }
     }
@@ -279,7 +276,7 @@ public class TradeManager implements Runnable {
 
         List<StockHistory> stockHistories = StockHistory.getTable().getSorted(guildId, 21);
 
-        for(StockHistory stockHistory : stockHistories) {
+        for (StockHistory stockHistory : stockHistories) {
             timeSeries.add(new Day(Date.from(stockHistory.getTimestamp())), stockHistory.getValue());
         }
 
@@ -296,8 +293,7 @@ public class TradeManager implements Runnable {
 
         XYItemRenderer renderer = plot.getRenderer();
 
-        if (renderer instanceof XYLineAndShapeRenderer) {
-            XYLineAndShapeRenderer r = (XYLineAndShapeRenderer) renderer;
+        if (renderer instanceof XYLineAndShapeRenderer r) {
             r.setDefaultShapesVisible(true);
             r.setDefaultShapesFilled(true);
             r.setDrawSeriesLineAsPath(true);
@@ -311,18 +307,18 @@ public class TradeManager implements Runnable {
     public void run() {
         ZonedDateTime time = Instant.now().atZone(ZoneOffset.systemDefault());
 
-        if((time.getHour()%3) == 0) {
+        if ((time.getHour() % 3) == 0) {
             System.out.println("Neue dividende: " + updateDividend());
         }
 
-        if(time.getHour() < 6) {
-            if(phase != 1)switchPhase(1);
+        if (time.getHour() < 6) {
+            if (phase != 1) switchPhase(1);
         }
-        if(time.getHour() >= 6 && time.getHour() < 13) {
-            if(phase != 2)switchPhase(2);
+        if (time.getHour() >= 6 && time.getHour() < 13) {
+            if (phase != 2) switchPhase(2);
         }
-        if(time.getHour() >= 13) {
-            if(phase != 3)switchPhase(3);
+        if (time.getHour() >= 13) {
+            if (phase != 3) switchPhase(3);
         }
     }
 }

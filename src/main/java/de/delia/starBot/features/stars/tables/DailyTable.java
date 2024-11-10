@@ -17,7 +17,7 @@ public class DailyTable extends Table<Daily> {
                     .setParameter(1, guildId)
                     .setParameter(2, memberId)
                     .getResultList();
-            if(dailyList.isEmpty()) {
+            if (dailyList.isEmpty()) {
                 Daily daily = new Daily(guildId, memberId, null, 0);
                 save(daily);
                 return daily;

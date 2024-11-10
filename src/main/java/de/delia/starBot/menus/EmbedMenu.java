@@ -33,7 +33,8 @@ public class EmbedMenu extends ListenerAdapter {
     private final List<Button> buttons = new ArrayList<>();
     private final Map<String, BiConsumer<GenericSelectMenuInteractionEvent<?, ? extends SelectMenu>, EmbedMenu>> selectMenuEvents = new HashMap<>();
     private final Map<String, BiConsumer<ButtonInteractionEvent, EmbedMenu>> buttonEvents = new HashMap<>();
-    @Getter @Setter
+    @Getter
+    @Setter
     private SelectMenu selectMenu = null;
     private Function<OpenEmbedMenuEvent, EmbedBuilder> embedFunction;
 
@@ -48,7 +49,7 @@ public class EmbedMenu extends ListenerAdapter {
         MessageEmbed embed = getEmbed(member, guild, channel).orElse(new EmbedBuilder().setTitle("404 No menu found")).build();
         List<ActionRow> actionRows = getComponents();
         StringSelectMenu navigator = getNavigator();
-        if(navigator != null)actionRows.add(ActionRow.of(getNavigator()));
+        if (navigator != null) actionRows.add(ActionRow.of(getNavigator()));
         return new EmbedMenuResponse(embed, actionRows, channel, member, guild);
     }
 
@@ -94,13 +95,14 @@ public class EmbedMenu extends ListenerAdapter {
     }
 
     public Optional<EmbedBuilder> getEmbed(Member member, Guild guild, Channel channel) {
-        if(embedFunction != null)return Optional.ofNullable(embedFunction.apply(new OpenEmbedMenuEvent(member, guild, channel)));
+        if (embedFunction != null)
+            return Optional.ofNullable(embedFunction.apply(new OpenEmbedMenuEvent(member, guild, channel)));
         return Optional.empty();
     }
 
     public StringSelectMenu getNavigator() {
-        if(parent == null && subMenus.isEmpty())return null;
-        if(subMenus.isEmpty())return getPrimaryMenu().getNavigator();
+        if (parent == null && subMenus.isEmpty()) return null;
+        if (subMenus.isEmpty()) return getPrimaryMenu().getNavigator();
 
         StringSelectMenu.Builder stringSelectMenuBuilder = StringSelectMenu.create(getId() + ":" + name);
         for (EmbedMenu subMenu : subMenus) stringSelectMenuBuilder.addOption(subMenu.name, subMenu.name);
@@ -157,7 +159,8 @@ public class EmbedMenu extends ListenerAdapter {
         return parent.getPrimaryMenu();
     }
 
-    public void onMenuButtonInteraction(MenuButtonInteractionEvent event) {}
+    public void onMenuButtonInteraction(MenuButtonInteractionEvent event) {
+    }
 
     @Override
     public void onGenericSelectMenuInteraction(@NotNull GenericSelectMenuInteractionEvent event) {
@@ -177,17 +180,17 @@ public class EmbedMenu extends ListenerAdapter {
         String menuId = buttonId.substring(0, buttonId.lastIndexOf(':'));
         EmbedMenu menu = getSubMenuWithId(menuId);
 
-        if(menu == null)return;
+        if (menu == null) return;
 
         // maybe make own function for that :3
-        for(Button button : menu.buttons) {
+        for (Button button : menu.buttons) {
             if (button.getId().equals(buttonId)) {
                 MenuButtonInteractionEvent menuButtonInteractionEvent = new MenuButtonInteractionEvent(event);
                 onMenuButtonInteraction(menuButtonInteractionEvent);
                 // cancel if event.isCanceled is true
-                if(menuButtonInteractionEvent.isCanceled()) return;
+                if (menuButtonInteractionEvent.isCanceled()) return;
 
-                if(menu.buttonEvents.containsKey(button.getId())) {
+                if (menu.buttonEvents.containsKey(button.getId())) {
                     menu.buttonEvents.get(button.getId()).accept(event, menu);
                 }
                 return;
@@ -197,16 +200,16 @@ public class EmbedMenu extends ListenerAdapter {
 
     @Override
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
-        if (!event.getSelectMenu().getId().startsWith(getId()))return;
+        if (!event.getSelectMenu().getId().startsWith(getId())) return;
         String[] idArgs = event.getSelectMenu().getId().split(":");
-        if(!(idArgs.length > 1 && idArgs[1].equals(name))) return;
+        if (!(idArgs.length > 1 && idArgs[1].equals(name))) return;
 
         String value = event.getSelectedOptions().get(0).getValue();
 
-        for(EmbedMenu subMenu : subMenus) {
-            if(value.equals(subMenu.name)) {
-                    EmbedMenuResponse embedMenuResponse = subMenu.generate(event.getMember(), event.getGuild(), event.getChannel());
-                    event.editMessageEmbeds(embedMenuResponse.embed).setComponents(embedMenuResponse.actionRows).queue();
+        for (EmbedMenu subMenu : subMenus) {
+            if (value.equals(subMenu.name)) {
+                EmbedMenuResponse embedMenuResponse = subMenu.generate(event.getMember(), event.getGuild(), event.getChannel());
+                event.editMessageEmbeds(embedMenuResponse.embed).setComponents(embedMenuResponse.actionRows).queue();
                 return;
             }
         }
@@ -227,9 +230,9 @@ public class EmbedMenu extends ListenerAdapter {
 
     @Getter
     public static class MenuButtonInteractionEvent {
+        private final ButtonInteractionEvent event;
         @Setter
         private boolean canceled = false;
-        private final ButtonInteractionEvent event;
 
         public MenuButtonInteractionEvent(ButtonInteractionEvent event) {
             this.event = event;

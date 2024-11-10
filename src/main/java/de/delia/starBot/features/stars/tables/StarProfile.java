@@ -33,7 +33,9 @@ public class StarProfile {
         this.shares = shares;
     }
 
-    public static StarProfileTable getTable() { return Main.INSTANCE.starProfileTable; }
+    public static StarProfileTable getTable() {
+        return Main.INSTANCE.starProfileTable;
+    }
 
     public void addStars(int amount) {
         this.stars += amount;

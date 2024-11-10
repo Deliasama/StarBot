@@ -6,11 +6,10 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class EmbedMenuInstance <T extends CacheableEmbedMenu> {
+public class EmbedMenuInstance<T extends CacheableEmbedMenu> {
     private final T embedMenu;
     private final net.dv8tion.jda.api.entities.Member member;
     private final Guild guild;

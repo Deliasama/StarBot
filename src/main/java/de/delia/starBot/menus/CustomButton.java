@@ -27,7 +27,7 @@ public class CustomButton extends ListenerAdapter {
     }
 
     public void handle(ButtonInteractionEvent event, String metaData) {
-        if(clickMethod != null)clickMethod.accept(event, metaData);
+        if (clickMethod != null) clickMethod.accept(event, metaData);
     }
 
     public Button getButton() {
@@ -44,7 +44,7 @@ public class CustomButton extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        if(event.getButton().getId().split("_")[0].equals(button.getId())) {
+        if (event.getButton().getId().split("_")[0].equals(button.getId())) {
             String metaData = event.getButton().getId().replaceFirst(event.getButton().getId().split("_")[0], "");
             handle(event, metaData);
         }

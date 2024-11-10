@@ -4,7 +4,7 @@ import jakarta.persistence.EntityManagerFactory;
 
 import java.util.Optional;
 
-public class Table <T> extends CustomEntityManager {
+public class Table<T> extends CustomEntityManager {
 
     private final Class<T> entityClass;
 

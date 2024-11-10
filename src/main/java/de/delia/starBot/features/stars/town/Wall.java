@@ -10,12 +10,12 @@ public class Wall extends Building {
     public Wall(BuildingEntity buildingEntity) {
         super(3, "Wall", Emoji.fromFormatted(":shield:"), buildingEntity.getGuildId(), buildingEntity.getMemberId(), buildingEntity.getLevel(), buildingEntity.getMetadata(), Map.of(
                 // 1. value: Building Level, 2. value: needed Townhall level, 3. value: price
-                1, new Integer[] {2, 100},
-                2, new Integer[] {2, 200},
-                3, new Integer[] {3, 400},
-                4, new Integer[] {3, 800},
-                5, new Integer[] {4, 1600},
-                6, new Integer[] {4, 3200})
+                1, new Integer[]{2, 100},
+                2, new Integer[]{2, 200},
+                3, new Integer[]{3, 400},
+                4, new Integer[]{3, 800},
+                5, new Integer[]{4, 1600},
+                6, new Integer[]{4, 3200})
         );
     }
 

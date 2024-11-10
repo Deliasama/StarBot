@@ -3,31 +3,29 @@ package de.delia.starBot.features.stars.town;
 import de.delia.starBot.features.stars.tables.BuildingEntity;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.main.Main;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
-import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Getter
 public abstract class Building implements Comparable<Building> {
+    final Map<Integer, Integer[]> upgradeRequirements;
     private final int id;
     private final String name;
     private final Emoji icon;
     private final long guildId;
     private final long memberId;
-
-    final Map<Integer, Integer[]> upgradeRequirements ;
-
     @Setter
     private int level;
 
@@ -62,7 +60,7 @@ public abstract class Building implements Comparable<Building> {
     public static Building loadBuilding(Class<? extends Building> type, long guildId, long memberId) {
         Optional<BuildingEntity> ob = Main.INSTANCE.buildingTable.get(guildId, memberId, type.getName());
 
-        if(ob.isPresent()) {
+        if (ob.isPresent()) {
             try {
                 return type.getConstructor(BuildingEntity.class).newInstance(ob.get());
             } catch (NoSuchMethodException e) {
@@ -88,7 +86,7 @@ public abstract class Building implements Comparable<Building> {
 
     public void save() {
         Optional<BuildingEntity> ob = Main.INSTANCE.buildingTable.get(guildId, memberId, this.getClass().getName());
-        if(ob.isPresent()) {
+        if (ob.isPresent()) {
             BuildingEntity be = ob.get();
             be.setLevel(level);
             be.setMetadata(writeMetaData());
@@ -97,18 +95,18 @@ public abstract class Building implements Comparable<Building> {
     }
 
     public boolean upgrade() throws UpgradeFailedException {
-        if(upgradeRequirements.containsKey(level+1)) {
+        if (upgradeRequirements.containsKey(level + 1)) {
             TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, guildId, memberId);
-            if(townHall == null) return false;
-            if(!(townHall.getLevel() >= upgradeRequirements.get(level+1)[0])) {
+            if (townHall == null) return false;
+            if (!(townHall.getLevel() >= upgradeRequirements.get(level + 1)[0])) {
                 throw new UpgradeFailedException("You need to upgrade your townhall for that!");
             }
             StarProfile starProfile = StarProfile.getTable().get(guildId, memberId);
-            if(starProfile == null) return false;
-            if(!(starProfile.getStars() >= upgradeRequirements.get(level+1)[1])) {
+            if (starProfile == null) return false;
+            if (!(starProfile.getStars() >= upgradeRequirements.get(level + 1)[1])) {
                 throw new UpgradeFailedException("You don't have enough stars!");
             }
-            starProfile.addStars(upgradeRequirements.get(level+1)[1] * -1);
+            starProfile.addStars(upgradeRequirements.get(level + 1)[1] * -1);
             Main.INSTANCE.starProfileTable.update(starProfile);
             level++;
             save();
@@ -122,20 +120,24 @@ public abstract class Building implements Comparable<Building> {
                 .setTitle(icon.getFormatted() + " " + name + " (lvl. " + level + ")")
                 .setColor(Color.cyan)
                 .setDescription(getDescription())
-                .addField(":arrow_double_up: Upgrade (" + upgradeRequirements.get(level+1)[1] + " Stars)", getUpgradeText(), false);
+                .addField(":arrow_double_up: Upgrade (" + upgradeRequirements.get(level + 1)[1] + " Stars)", getUpgradeText(), false);
 
         return embedBuilder.build();
     }
 
     public abstract void readMetaData(String metaData);
+
     public abstract String writeMetaData();
+
     public abstract void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id);
+
     public abstract String getDescription();
+
     public abstract String getUpgradeText();
 
     @Override
     public int compareTo(@NotNull Building o) {
-        return id-o.getId();
+        return id - o.getId();
     }
 
     public static class UpgradeFailedException extends Exception {

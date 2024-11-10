@@ -1,18 +1,15 @@
 package de.delia.starBot.features.stars.town;
 
 import de.delia.starBot.features.stars.tables.BuildingEntity;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class TownHall extends Building {
 
-    private static Map<Class<? extends Building>, Integer> buildingUnlockTable = Map.of(
+    private static final Map<Class<? extends Building>, Integer> buildingUnlockTable = Map.of(
             Telescope.class, 2,
             Wall.class, 2
     );
@@ -20,9 +17,9 @@ public class TownHall extends Building {
     public TownHall(BuildingEntity buildingEntity) {
         super(1, "Townhall", Emoji.fromFormatted(":classical_building:"), buildingEntity.getGuildId(), buildingEntity.getMemberId(), buildingEntity.getLevel(), buildingEntity.getMetadata(), Map.of(
                 // 1. value: Building Level, 2. value: needed Townhall level, 3. value: price
-                2, new Integer[] {0, 100},
-            3, new Integer[] {0, 350},
-            4, new Integer[]{0, 1000}
+                2, new Integer[]{0, 100},
+                3, new Integer[]{0, 350},
+                4, new Integer[]{0, 1000}
         ));
     }
 
@@ -73,7 +70,7 @@ public class TownHall extends Building {
                 .forEach(entry -> {
                     Class<? extends Building> type = entry.getKey();
 
-                    if(!(buildings.stream().anyMatch(b -> b.getClass().equals(type)))) {
+                    if (!(buildings.stream().anyMatch(b -> b.getClass().equals(type)))) {
                         Building building = Building.create(type, getGuildId(), getMemberId());
                         buildings.add(building);
                     }

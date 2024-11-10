@@ -7,9 +7,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 
 public class Main {
+    public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     public static Bot INSTANCE;
     public static Dotenv DOTENV;
-    public static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public static void main(String[] args) {
         java.util.logging.Logger.getLogger("org.hibernate.*").setLevel(Level.SEVERE);

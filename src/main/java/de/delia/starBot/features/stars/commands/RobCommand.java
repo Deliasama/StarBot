@@ -21,14 +21,14 @@ import java.util.Random;
 
 @ApplicationCommand(name = "rob", description = "Rob other Users!")
 public class RobCommand {
-    Random random = new Random();
     static Map<String, Instant> cooldowns = new HashMap<>();
+    Random random = new Random();
     Duration cooldownDuration = Duration.ofHours(6);
 
     @ApplicationCommandMethod
     public void onCommand(Bot bot, SlashCommandInteractionEvent event, @Option(description = "Member to rob") User other) {
-        if(cooldowns.containsKey(event.getMember().getId())) {
-            if(!Instant.now().isAfter(cooldowns.get(event.getMember().getId()).plus(cooldownDuration))) {
+        if (cooldowns.containsKey(event.getMember().getId())) {
+            if (!Instant.now().isAfter(cooldowns.get(event.getMember().getId()).plus(cooldownDuration))) {
                 event.reply("You have to wait until " + TimeFormat.RELATIVE.atInstant(cooldowns.get(event.getMember().getId()).plus(cooldownDuration)) + " to rob again!").setEphemeral(true).queue();
                 return;
             }
@@ -42,11 +42,11 @@ public class RobCommand {
         double r = ((double) random.nextInt(10)) / 100.0;
 
         Wall wall = (Wall) Building.loadBuilding(Wall.class, event.getGuild().getIdLong(), other.getIdLong());
-        if(wall != null) r-= (((double) wall.getLevel())*0.005);
+        if (wall != null) r -= (((double) wall.getLevel()) * 0.005);
 
         int toSteal = (int) (profileVictim.getStars() * r);
 
-        profileVictim.addStars(toSteal*-1);
+        profileVictim.addStars(toSteal * -1);
         profile.addStars(toSteal);
 
         EmbedBuilder builder = new EmbedBuilder()

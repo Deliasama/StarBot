@@ -27,14 +27,14 @@ public class StockHistory {
     @Column
     private Instant timestamp;
 
-    public static StockHistoryTable getTable() {
-        return Main.INSTANCE.stockHistoryTable;
-    }
-
     public StockHistory(Long guildId, int value, Instant timestamp) {
         this.guildId = guildId;
         this.value = value;
         this.timestamp = timestamp;
+    }
+
+    public static StockHistoryTable getTable() {
+        return Main.INSTANCE.stockHistoryTable;
     }
 
     public static class StockHistoryTable extends de.delia.starBot.database.Table<StockHistory> {
@@ -48,7 +48,7 @@ public class StockHistory {
                         .setParameter(1, guildId)
                         .setParameter(2, limit)
                         .getResultList();
-                return stockHistories==null ? new ArrayList<>() : stockHistories;
+                return stockHistories == null ? new ArrayList<>() : stockHistories;
             });
         }
     }

@@ -7,7 +7,6 @@ import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.features.stars.town.Building;
 import de.delia.starBot.features.stars.town.TownHall;
 import de.delia.starBot.main.Bot;
-import de.delia.starBot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.TimeFormat;
@@ -23,12 +22,12 @@ public class DailyCommand {
         StarProfile starProfile = StarProfile.getTable().get(event.getGuild().getIdLong(), event.getUser().getIdLong());
 
         ZonedDateTime now = Instant.now().atZone(ZoneOffset.systemDefault());
-        ZonedDateTime lastCalled = daily.getLastCalled()==null ? now.minusDays(1) : daily.getLastCalled().atZone(ZoneOffset.systemDefault());
+        ZonedDateTime lastCalled = daily.getLastCalled() == null ? now.minusDays(1) : daily.getLastCalled().atZone(ZoneOffset.systemDefault());
 
-        if(now.getDayOfYear() != lastCalled.getDayOfYear() || now.getYear() != lastCalled.getYear()) {
-            if(now.minusDays(1).getDayOfYear() == lastCalled.getDayOfYear()) {
-                if(daily.getStreak()<11) {
-                    daily.setStreak(daily.getStreak()+1);
+        if (now.getDayOfYear() != lastCalled.getDayOfYear() || now.getYear() != lastCalled.getYear()) {
+            if (now.minusDays(1).getDayOfYear() == lastCalled.getDayOfYear()) {
+                if (daily.getStreak() < 11) {
+                    daily.setStreak(daily.getStreak() + 1);
                 }
             } else {
                 daily.setStreak(1);
@@ -44,12 +43,13 @@ public class DailyCommand {
             */
 
             TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
-            if(townHall==null) townHall = (TownHall) Building.create(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
-            if(townHall.getLevel()==0) {
+            if (townHall == null)
+                townHall = (TownHall) Building.create(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
+            if (townHall.getLevel() == 0) {
                 townHall.setLevel(1);
                 townHall.save();
             }
-            int starsEarned = (10*townHall.getLevel()) + ((daily.getStreak()-1)*townHall.getLevel()); //+ dividendBonus;
+            int starsEarned = (10 * townHall.getLevel()) + ((daily.getStreak() - 1) * townHall.getLevel()); //+ dividendBonus;
 
             starProfile.addStars(starsEarned);
             Daily.getTable().update(daily);
@@ -59,7 +59,7 @@ public class DailyCommand {
                     .setColor(Color.cyan)
                     .setTitle("Daily")
                     .setTimestamp(Instant.now())
-                    .setDescription("You earned **" + starsEarned + "** Stars!\nStreak: **" + (daily.getStreak()-1) + "** :fire:");
+                    .setDescription("You earned **" + starsEarned + "** Stars!\nStreak: **" + (daily.getStreak() - 1) + "** :fire:");
 
             event.replyEmbeds(embedBuilder.build()).queue();
         } else {

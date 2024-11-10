@@ -1,6 +1,5 @@
 package de.delia.starBot.features.stars.menus;
 
-import com.iwebpp.crypto.TweetNaclFast;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.features.stars.town.Building;
 import de.delia.starBot.features.stars.town.Telescope;
@@ -35,18 +34,19 @@ public class StarDropMenu extends ButtonMenu {
     @Override
     public void buttonInteraction(ButtonInteractionEvent event) {
         // checks if the starDrop is already claimed
-        if(collected.getOrDefault(Objects.requireNonNull(event.getGuild()).getIdLong(), false)) {
+        if (collected.getOrDefault(Objects.requireNonNull(event.getGuild()).getIdLong(), false)) {
             event.reply("to slow!").setEphemeral(true).queue();
             return;
         }
 
         // checks if the clicked button and then claims the drop
-        if(event.getButton().getId().split(":")[1].equals("X")) {
+        if (event.getButton().getId().split(":")[1].equals("X")) {
             collected.put(event.getGuild().getIdLong(), true);
-            int starsEarned = random.nextInt(21)+10;
+            int starsEarned = random.nextInt(21) + 10;
 
             Telescope telescope = (Telescope) Building.loadBuilding(Telescope.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
-            if(telescope != null) starsEarned = ((int) (((long) starsEarned) * (1.0 + ((long) telescope.getLevel() * 0.5))));
+            if (telescope != null)
+                starsEarned = ((int) (((long) starsEarned) * (1.0 + ((long) telescope.getLevel() * 0.5))));
 
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setTitle("Shooting Star!")

@@ -15,7 +15,7 @@ import java.awt.*;
 public class StarsCommand {
     @ApplicationCommandMethod
     public void command(Bot bot, SlashCommandInteractionEvent event, @Option(isRequired = false, description = "other Member") User other) {
-        User user = other==null?event.getMember().getUser():other;
+        User user = other == null ? event.getMember().getUser() : other;
 
         event.getGuild().retrieveMember(user).queue(member -> {
             StarProfile profile = StarProfile.getTable().get(event.getGuild().getIdLong(), member.getIdLong());
@@ -28,7 +28,7 @@ public class StarsCommand {
 
             event.replyEmbeds(embedBuilder.build()).queue();
         }, throwable -> {
-            if(!event.isAcknowledged())event.reply("Error!").setEphemeral(true).queue();
+            if (!event.isAcknowledged()) event.reply("Error!").setEphemeral(true).queue();
         });
     }
 }

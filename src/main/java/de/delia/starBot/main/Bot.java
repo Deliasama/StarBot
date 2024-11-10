@@ -7,9 +7,9 @@ import de.delia.starBot.features.basics.StatusCommand;
 import de.delia.starBot.features.stars.TradeManager;
 import de.delia.starBot.features.stars.commands.*;
 import de.delia.starBot.features.stars.listeners.ButtonInteractionListener;
+import de.delia.starBot.features.stars.listeners.MessageReceivedListener;
 import de.delia.starBot.features.stars.listeners.VoiceStarsListeners;
 import de.delia.starBot.features.stars.menus.StarDropMenu;
-import de.delia.starBot.features.stars.listeners.MessageReceivedListener;
 import de.delia.starBot.features.stars.tables.*;
 import de.delia.starBot.guildConfig.ConfigCommand;
 import de.delia.starBot.guildConfig.GuildConfig;
@@ -22,7 +22,6 @@ import jakarta.persistence.Persistence;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
@@ -33,13 +32,11 @@ import java.util.Map;
 import java.util.Properties;
 
 public class Bot {
-    public String version;
-    public Instant startTime = Instant.now();
-
     public final JDA jda;
     public final CommandManager commandManager;
     public final EntityManagerFactory entityManagerFactory;
-
+    public String version;
+    public Instant startTime = Instant.now();
     public StarProfileTable starProfileTable;
     public DailyTable dailyTable;
     public StockHistory.StockHistoryTable stockHistoryTable;
@@ -104,7 +101,7 @@ public class Bot {
     }
 
     public void initTables() {
-        if(entityManagerFactory == null) {
+        if (entityManagerFactory == null) {
             System.out.println("Datenbank fehler!");
             return;
         }

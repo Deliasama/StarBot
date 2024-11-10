@@ -11,6 +11,7 @@ public class CustomEntityManager {
     public CustomEntityManager(EntityManagerFactory factory) {
         this.factory = factory;
     }
+
     public <T> T getEntityManager(Function<EntityManager, T> function) {
         EntityManager entityManager = factory.createEntityManager();
         try {

@@ -82,15 +82,15 @@ public class Command<T> {
 
         // locates the field annotated with @ApplicationCommandPermission and sets the command permissions
         for (Field f : clazz.getDeclaredFields()) {
-            if(f.isAnnotationPresent(ApplicationCommandPermission.class)) {
-                if(Collection.class.isAssignableFrom(f.getType())) {
+            if (f.isAnnotationPresent(ApplicationCommandPermission.class)) {
+                if (Collection.class.isAssignableFrom(f.getType())) {
                     f.setAccessible(true);
 
                     Collection<?> collection = (Collection<?>) f.get(object);
 
-                    if(collection != null) {
-                        if(!collection.isEmpty()) {
-                            if(collection.iterator().next() instanceof Permission) {
+                    if (collection != null) {
+                        if (!collection.isEmpty()) {
+                            if (collection.iterator().next() instanceof Permission) {
                                 permissions.addAll((Collection<? extends Permission>) collection);
                             } else {
                                 throw new IllegalArgumentException();
@@ -107,7 +107,7 @@ public class Command<T> {
 
         if (event.getSubcommandName() != null) {
             for (Command<?> c : subCommands) {
-                if(c.name.equals(event.getSubcommandName())) {
+                if (c.name.equals(event.getSubcommandName())) {
                     try {
                         c.performCommand(event);
                         return;

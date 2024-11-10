@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DropdownMenu extends ListenerAdapter {
-    List<Option> options = new ArrayList<>();
     final String id;
+    List<Option> options = new ArrayList<>();
 
     public DropdownMenu(Bot bot, String id) {
         this.id = id;
@@ -23,8 +23,8 @@ public abstract class DropdownMenu extends ListenerAdapter {
 
         Class<? extends DropdownMenu> clazz = this.getClass();
 
-        for(Method method : clazz.getDeclaredMethods()) {
-            if(method.isAnnotationPresent(MyStringSelectOption.class)) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(MyStringSelectOption.class)) {
                 MyStringSelectOption annotation = method.getAnnotation(MyStringSelectOption.class);
                 options.add(new Option(annotation.value(), SelectOption.of(annotation.label(), annotation.value()), method));
             }
@@ -33,11 +33,11 @@ public abstract class DropdownMenu extends ListenerAdapter {
 
     @Override
     public void onStringSelectInteraction(StringSelectInteractionEvent event) {
-        if(event.getComponentId().equals(id)) {
+        if (event.getComponentId().equals(id)) {
             onInteraction(event);
-            for(SelectOption o : event.getSelectedOptions()) {
-                for(Option option : options) {
-                    if(o.getValue().equals(option.value)) {
+            for (SelectOption o : event.getSelectedOptions()) {
+                for (Option option : options) {
+                    if (o.getValue().equals(option.value)) {
                         try {
                             option.method.invoke(this, event);
                         } catch (IllegalAccessException | InvocationTargetException e) {

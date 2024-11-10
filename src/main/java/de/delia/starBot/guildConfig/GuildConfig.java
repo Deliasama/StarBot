@@ -2,14 +2,11 @@ package de.delia.starBot.guildConfig;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.delia.starBot.features.stars.tables.Dividend;
 import de.delia.starBot.main.Main;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.checkerframework.common.aliasing.qual.Unique;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -22,15 +19,13 @@ import java.util.Map;
 public class GuildConfig {
     public static final Map<Long, GuildConfig> bufferedConfigs = new HashMap<>();
     private static final ObjectMapper objectMapper = new ObjectMapper();
-
-    @Id
-    private Long guildId;
-
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "config", joinColumns = @JoinColumn(name = "guildConfig_id"))
     @MapKeyColumn(name = "key")
     @Column(name = "value")
     Map<String, String> configs = new HashMap<>();
+    @Id
+    private Long guildId;
 
     public GuildConfig(Long guildId) {
         this.guildId = guildId;
@@ -48,7 +43,7 @@ public class GuildConfig {
     }
 
     public static GuildConfig getGuildConfig(long guildId) {
-        if(bufferedConfigs.containsKey(guildId)) {
+        if (bufferedConfigs.containsKey(guildId)) {
             return bufferedConfigs.get(guildId);
         } else {
             GuildConfig config = Main.INSTANCE.guildConfigTable.get(guildId);
@@ -58,7 +53,7 @@ public class GuildConfig {
     }
 
     public <T> List<T> getConfigList(String key, Class<T> type) {
-        if(!configs.containsKey(key))return null;
+        if (!configs.containsKey(key)) return null;
         try {
             return objectMapper.readValue(configs.get(key), objectMapper.getTypeFactory().constructCollectionType(List.class, type));
         } catch (JsonProcessingException e) {
@@ -75,7 +70,7 @@ public class GuildConfig {
     }
 
     public <T> T getConfig(String key, Class<T> type) {
-        if(!configs.containsKey(key))return null;
+        if (!configs.containsKey(key)) return null;
         return objectMapper.convertValue(configs.get(key), type);
     }
 
@@ -98,7 +93,7 @@ public class GuildConfig {
                 List<GuildConfig> guildConfigs = m.createQuery("SELECT c from GuildConfig c where c.guildId = ?1", GuildConfig.class)
                         .setParameter(1, guildId)
                         .getResultList();
-                if(guildConfigs.isEmpty()) {
+                if (guildConfigs.isEmpty()) {
                     GuildConfig config = new GuildConfig(guildId);
                     save(config);
                     return config;

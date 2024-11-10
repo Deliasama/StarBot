@@ -1,6 +1,5 @@
 package de.delia.starBot.features.stars.listeners;
 
-import com.iwebpp.crypto.TweetNaclFast;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.features.stars.town.Building;
 import de.delia.starBot.features.stars.town.Telescope;
@@ -12,7 +11,6 @@ import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +28,7 @@ public class VoiceStarsListeners extends ListenerAdapter {
                 StarProfile starProfile = StarProfile.getTable().get(g, m);
                 Telescope telescope = (Telescope) Building.loadBuilding(Telescope.class, g, m);
                 double multiplier = 1.0;
-                if (telescope != null) multiplier+=((double) telescope.getLevel() * 0.5);
+                if (telescope != null) multiplier += ((double) telescope.getLevel() * 0.5);
 
                 starProfile.addStars((int) Math.round(multiplier));
 
@@ -43,7 +41,8 @@ public class VoiceStarsListeners extends ListenerAdapter {
     public void onGenericGuildVoice(GenericGuildVoiceEvent event) {
         // Voice Activity Stars
         if (event instanceof GuildVoiceUpdateEvent updateEvent) {
-            if (updateEvent.getChannelLeft() != null && updateEvent.getChannelJoined() == null) membersInVoice.remove(updateEvent.getMember().getIdLong());
+            if (updateEvent.getChannelLeft() != null && updateEvent.getChannelJoined() == null)
+                membersInVoice.remove(updateEvent.getMember().getIdLong());
 
             updateVoice(updateEvent.getChannelLeft());
             updateVoice(updateEvent.getChannelJoined());
@@ -58,7 +57,8 @@ public class VoiceStarsListeners extends ListenerAdapter {
                 .filter(member -> !member.getVoiceState().isMuted())
                 .toList();
 
-        if (members.size() >= 2) members.forEach(member -> membersInVoice.put(member.getIdLong(), channel.getGuild().getIdLong()));
+        if (members.size() >= 2)
+            members.forEach(member -> membersInVoice.put(member.getIdLong(), channel.getGuild().getIdLong()));
 
         channel.getMembers().forEach(m -> {
             if (!members.contains(m)) membersInVoice.remove(m.getIdLong());

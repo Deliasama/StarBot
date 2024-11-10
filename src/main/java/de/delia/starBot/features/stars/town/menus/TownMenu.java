@@ -2,7 +2,6 @@ package de.delia.starBot.features.stars.town.menus;
 
 import de.delia.starBot.features.stars.town.Building;
 import de.delia.starBot.features.stars.town.TownHall;
-import de.delia.starBot.main.Main;
 import de.delia.starBot.menus.CacheableEmbedMenu;
 import de.delia.starBot.menus.EmbedMenu;
 import de.delia.starBot.menus.EmbedMenuInstance;
@@ -14,12 +13,10 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
 import org.jetbrains.annotations.NotNull;
 
@@ -28,7 +25,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 public class TownMenu extends CacheableEmbedMenu {
     private final BuildingMenu buildingMenu;
@@ -49,7 +45,7 @@ public class TownMenu extends CacheableEmbedMenu {
                 .setAuthor(member.getUser().getName(), null, member.getUser().getAvatarUrl())
                 .setTimestamp(Instant.now());
 
-        for(Building building : buildings) {
+        for (Building building : buildings) {
             embedBuilder.addField(building.getIcon().getFormatted() + " **" + building.getName() + "**", "Level: " + building.getLevel(), false);
         }
         return embedBuilder;
@@ -59,15 +55,16 @@ public class TownMenu extends CacheableEmbedMenu {
     public void onStringSelectInteraction(@NotNull StringSelectInteractionEvent event) {
         if (!event.getSelectMenu().getId().startsWith(getId())) return;
 
-        if(event.getInteraction().getValues().isEmpty()) return;
+        if (event.getInteraction().getValues().isEmpty()) return;
         String value = event.getInteraction().getValues().get(0);
 
         TownMenuInstance<TownMenu> townMenuInstance = (TownMenuInstance<TownMenu>) getInstance(generateCacheKey(event.getMember(), event.getGuild()));
-        if(townMenuInstance == null || townMenuInstance.isExpired(Instant.now().getEpochSecond())) regenerate(event.getMember(), event.getGuild(), event.getChannel());
+        if (townMenuInstance == null || townMenuInstance.isExpired(Instant.now().getEpochSecond()))
+            regenerate(event.getMember(), event.getGuild(), event.getChannel());
         townMenuInstance = (TownMenuInstance<TownMenu>) getInstance(generateCacheKey(event.getMember(), event.getGuild()));
 
         for (Building building : townMenuInstance.getBuildings()) {
-            if(building.getName().equals(value)) {
+            if (building.getName().equals(value)) {
                 EmbedMenuResponse response = buildingMenu.generate(event.getMember(), event.getGuild(), event.getChannel());
 
                 List<ActionRow> actionRows = response.getActionRows();
@@ -97,11 +94,11 @@ public class TownMenu extends CacheableEmbedMenu {
 
         TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, guild.getIdLong(), member.getIdLong());
 
-        if(townHall == null) {
+        if (townHall == null) {
             townHall = (TownHall) Building.create(TownHall.class, guild.getIdLong(), member.getIdLong());
         }
-        if(townHall == null) return null;
-        if(townHall.getLevel() == 0) {
+        if (townHall == null) return null;
+        if (townHall.getLevel() == 0) {
             townHall.setLevel(1);
             townHall.save();
         }
@@ -122,7 +119,7 @@ public class TownMenu extends CacheableEmbedMenu {
         selectMenu.setPlaceholder("navigate");
         selectMenu.setMaxValues(1);
 
-        for(Building building : buildings) {
+        for (Building building : buildings) {
             selectMenu.addOption(building.getName(), building.getName());
         }
 
@@ -134,18 +131,17 @@ public class TownMenu extends CacheableEmbedMenu {
             String value = event.getButton().getId().split(":")[event.getButton().getId().split(":").length - 1];
 
             EmbedMenuInstance<?> instance = getInstance(generateCacheKey(event.getMember(), event.getGuild()));
-            if(instance == null || instance.isExpired(Instant.now().getEpochSecond())) {
+            if (instance == null || instance.isExpired(Instant.now().getEpochSecond())) {
                 regenerate(event.getMember(), event.getGuild(), event.getChannel());
                 instance = getInstance(generateCacheKey(event.getMember(), event.getGuild()));
             }
 
-            if(!(instance instanceof TownMenuInstance)) return;
-            TownMenuInstance<?> townMenuInstance = (TownMenuInstance<?>) instance;
+            if (!(instance instanceof TownMenuInstance<?> townMenuInstance)) return;
 
             for (Building building : townMenuInstance.getBuildings()) {
-                if(building.getName().equals(value)) {
+                if (building.getName().equals(value)) {
                     try {
-                        if(building.upgrade()) {
+                        if (building.upgrade()) {
                             event.reply(building.getName() + " is upgraded to level **" + building.getLevel() + "**").setEphemeral(true).queue();
 
                             EmbedMenuResponse response = regenerate(event.getMember(), event.getGuild(), event.getChannel());
@@ -165,7 +161,7 @@ public class TownMenu extends CacheableEmbedMenu {
 
 
     @Getter
-    public static class TownMenuInstance <T extends TownMenu> extends EmbedMenuInstance<TownMenu> {
+    public static class TownMenuInstance<T extends TownMenu> extends EmbedMenuInstance<TownMenu> {
         private final TownHall townHall;
         private final List<Building> buildings;
 
@@ -190,15 +186,15 @@ public class TownMenu extends CacheableEmbedMenu {
 
         @Override
         public void onMenuButtonInteraction(MenuButtonInteractionEvent event) {
-            if(event == null)return;
-            if(event.getEvent().getButton().getId().equals(getId() + ":back")) return;
+            if (event == null) return;
+            if (event.getEvent().getButton().getId().equals(getId() + ":back")) return;
             String[] args = event.getEvent().getButton().getId().split(":");
             String name = args[args.length - 2];
             try {
                 Class<? extends Building> type = (Class<? extends Building>) Class.forName(name);
                 Building building = Building.loadBuilding(type, event.getEvent().getGuild().getIdLong(), event.getEvent().getMember().getIdLong());
 
-                if(building == null) return;
+                if (building == null) return;
 
                 building.onButtonInteraction(event.getEvent(), args[args.length - 1]);
             } catch (ClassNotFoundException e) {

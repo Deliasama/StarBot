@@ -14,15 +14,15 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 public class ButtonInteractionListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        if(event.getButton().getId().equalsIgnoreCase("stock.offer")) {
-            if(!GuildConfig.getGuildConfig(event.getGuild().getIdLong()).getConfig("enableStock", Boolean.class)) {
+        if (event.getButton().getId().equalsIgnoreCase("stock.offer")) {
+            if (!GuildConfig.getGuildConfig(event.getGuild().getIdLong()).getConfig("enableStock", Boolean.class)) {
                 event.reply("The Stock System is disabled on this server!").setEphemeral(true).queue();
                 return;
             }
 
             TradeManager tradeManager = Main.INSTANCE.tradeManagers.get(event.getGuild().getIdLong());
-            if(tradeManager == null)return;
-            if((tradeManager.getOfferMemberId()==null? 0L :tradeManager.getOfferMemberId()) == event.getUser().getIdLong()) {
+            if (tradeManager == null) return;
+            if ((tradeManager.getOfferMemberId() == null ? 0L : tradeManager.getOfferMemberId()) == event.getUser().getIdLong()) {
                 event.reply("Du bist bereits der Höchstbietende!").setEphemeral(true).queue();
                 return;
             }
@@ -33,27 +33,27 @@ public class ButtonInteractionListener extends ListenerAdapter {
                     .build();
 
             Modal modal = Modal.create("stock.offer.modal", "Angebot")
-                            .addActionRow(textInput).build();
+                    .addActionRow(textInput).build();
 
             event.replyModal(modal).queue();
         }
-        if(event.getButton().getId().equalsIgnoreCase("stock.sell")) {
+        if (event.getButton().getId().equalsIgnoreCase("stock.sell")) {
             TradeManager tradeManager = Main.INSTANCE.tradeManagers.get(event.getGuild().getIdLong());
-            if(tradeManager == null)return;
+            if (tradeManager == null) return;
 
             StarProfile profile = StarProfile.getTable().get(event.getGuild().getIdLong(), event.getUser().getIdLong());
-            if(profile == null)return;
-            if(profile.getShares() < 1) {
+            if (profile == null) return;
+            if (profile.getShares() < 1) {
                 event.reply("Du hast keine Aktien!").setEphemeral(true).queue();
                 return;
             }
 
-            if(tradeManager.getMembersSell().contains(event.getUser().getIdLong())) {
+            if (tradeManager.getMembersSell().contains(event.getUser().getIdLong())) {
                 event.reply("Du kannst Maximal einen verkaufen!").setEphemeral(true);
                 return;
             }
 
-            if(tradeManager.sell(event.getUser().getIdLong())) {
+            if (tradeManager.sell(event.getUser().getIdLong())) {
                 event.reply("Du verkaufst eine Aktie in der nächsten Auktion!").setEphemeral(true).queue();
             } else {
                 event.reply("Etwas ist schief gelaufen :/").setEphemeral(true).queue();
@@ -63,8 +63,8 @@ public class ButtonInteractionListener extends ListenerAdapter {
 
     @Override
     public void onModalInteraction(ModalInteractionEvent event) {
-        if(event.getModalId().equals("stock.offer.modal")) {
-            if(!GuildConfig.getGuildConfig(event.getGuild().getIdLong()).getConfig("enableStock", Boolean.class)) {
+        if (event.getModalId().equals("stock.offer.modal")) {
+            if (!GuildConfig.getGuildConfig(event.getGuild().getIdLong()).getConfig("enableStock", Boolean.class)) {
                 event.reply("The Stock System is disabled on this server!").setEphemeral(true).queue();
                 return;
             }
@@ -81,7 +81,7 @@ public class ButtonInteractionListener extends ListenerAdapter {
             }
              */
 
-            if(tradeManager.offer(event.getUser().getIdLong(), offer)) {
+            if (tradeManager.offer(event.getUser().getIdLong(), offer)) {
                 event.editMessageEmbeds(tradeManager.createEmbed(event.getMember()).build()).queue();
             } else {
                 event.reply("Etwas ist schief gelaufen :/").setEphemeral(true).queue();

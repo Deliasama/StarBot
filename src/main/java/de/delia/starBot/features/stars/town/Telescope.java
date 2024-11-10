@@ -1,20 +1,19 @@
 package de.delia.starBot.features.stars.town;
 
 import de.delia.starBot.features.stars.tables.BuildingEntity;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 import java.util.Map;
 
-public class Telescope extends Building{
+public class Telescope extends Building {
     public Telescope(BuildingEntity buildingEntity) {
-        super(2, "Telescope", Emoji.fromFormatted(":telescope:"), buildingEntity.getGuildId(), buildingEntity.getMemberId(), buildingEntity.getLevel(), buildingEntity.getMetadata(),  Map.of(
+        super(2, "Telescope", Emoji.fromFormatted(":telescope:"), buildingEntity.getGuildId(), buildingEntity.getMemberId(), buildingEntity.getLevel(), buildingEntity.getMetadata(), Map.of(
                 // 1. value: Building Level, 2. value: needed Townhall level, 3. value: price
-                1, new Integer[] {2, 100},
-                2, new Integer[] {2, 175},
-                3, new Integer[] {3, 300},
-                4, new Integer[] {3, 500})
+                1, new Integer[]{2, 100},
+                2, new Integer[]{2, 175},
+                3, new Integer[]{3, 300},
+                4, new Integer[]{3, 500})
         );
     }
 

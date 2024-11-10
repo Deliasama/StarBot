@@ -21,7 +21,7 @@ public class Visit {
         if (!event.isFromGuild() || event.getGuild() == null) return;
 
         TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, event.getGuild().getIdLong(), user.getIdLong());
-        if(townHall == null) {
+        if (townHall == null) {
             event.reply("Something went wrong!").setEphemeral(true).queue();
             return;
         }
@@ -35,7 +35,7 @@ public class Visit {
                 .setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl())
                 .setTimestamp(Instant.now());
 
-        for(Building building : buildings) {
+        for (Building building : buildings) {
             embedBuilder.addField(building.getIcon().getFormatted() + " **" + building.getName() + "**", "Level: " + building.getLevel(), false);
         }
 
