@@ -23,26 +23,25 @@ public class VoiceStarsListeners extends ListenerAdapter {
     public void onReady(ReadyEvent event) {
         event.getJDA().getVoiceChannels().forEach(this::updateVoice);
 
-        Main.scheduler.scheduleAtFixedRate(() -> {
-            membersInVoice.forEach((m, g) -> {
-                StarProfile starProfile = StarProfile.getTable().get(g, m);
-                Telescope telescope = (Telescope) Building.loadBuilding(Telescope.class, g, m);
-                double multiplier = 1.0;
-                if (telescope != null) multiplier += ((double) telescope.getLevel() * 0.5);
+        Main.scheduler.scheduleAtFixedRate(() -> membersInVoice.forEach((m, g) -> {
+            StarProfile starProfile = StarProfile.getTable().get(g, m);
+            Telescope telescope = (Telescope) Building.loadBuilding(Telescope.class, g, m);
+            double multiplier = 1.0;
+            if (telescope != null) multiplier += ((double) telescope.getLevel() * 0.5);
 
-                starProfile.addStars((int) Math.round(multiplier));
+            starProfile.addStars((int) Math.round(multiplier));
 
-                System.out.println("someone received stars from voice activity! ID: " + m);
-            });
-        }, 0, 10, TimeUnit.MINUTES);
+            System.out.println("someone received stars from voice activity! ID: " + m);
+        }), 0, 10, TimeUnit.MINUTES);
     }
 
     @Override
     public void onGenericGuildVoice(GenericGuildVoiceEvent event) {
         // Voice Activity Stars
         if (event instanceof GuildVoiceUpdateEvent updateEvent) {
-            if (updateEvent.getChannelLeft() != null && updateEvent.getChannelJoined() == null)
+            if (updateEvent.getChannelLeft() != null && updateEvent.getChannelJoined() == null) {
                 membersInVoice.remove(updateEvent.getMember().getIdLong());
+            }
 
             updateVoice(updateEvent.getChannelLeft());
             updateVoice(updateEvent.getChannelJoined());

@@ -135,6 +135,7 @@ public class EmbedMenu extends ListenerAdapter {
     public EmbedMenu getSubMenuWithId(String id) {
         if (!id.startsWith(getId())) return null;
         if (id.equals(getId())) return this;
+        if (subMenus.isEmpty()) return this;
 
         for (EmbedMenu subMenu : subMenus) {
             if (id.startsWith(subMenu.getId())) {
@@ -167,6 +168,7 @@ public class EmbedMenu extends ListenerAdapter {
         if (!event.getSelectMenu().getId().startsWith(getId())) return;
 
         EmbedMenu menu = getSubMenuWithId(event.getSelectMenu().getId());
+
         if (menu == null) return;
         if (menu.selectMenuEvents.get(event.getSelectMenu().getId()) == null) return;
         menu.selectMenuEvents.get(event.getSelectMenu().getId()).accept(event, menu);

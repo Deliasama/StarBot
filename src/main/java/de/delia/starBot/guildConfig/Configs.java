@@ -9,7 +9,11 @@ public enum Configs {
     ENABLE_STAR_DROP("enableStarDrop", Boolean.class, true),
     STAR_DROP_MESSAGE_MAX("starDropMessageMax", Integer.class, 60),
     STAR_DROP_MESSAGE_MIN("starDropMessageMin", Integer.class, 30),
-    STAR_DROP_BLACKLISTED_CHANNEL("starDropBlacklistedChannel", Long.class, new ArrayList<>());
+    STAR_DROP_BLACKLISTED_CHANNEL("starDropBlacklistedChannel", Long.class, new ArrayList<>()),
+
+    ENABLE_LOG("enableLog", Boolean.class, false),
+    LOG_CHANNEL("logChannel", Long.class, null),
+    ;
 
     public final String id;
     public final Class<?> type;

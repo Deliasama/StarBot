@@ -29,10 +29,12 @@ public class GuildConfig {
 
     public GuildConfig(Long guildId) {
         this.guildId = guildId;
+        /*
 
         // Stock
         this.configs.put("enableStock", String.valueOf(false));
 
+        // StarDrop
         this.configs.put("enableStarDrop", String.valueOf(true));
         this.configs.put("starDropMessageMin", String.valueOf(30));
         this.configs.put("starDropMessageMax", String.valueOf(60));
@@ -40,7 +42,7 @@ public class GuildConfig {
             this.configs.put("starDropBlacklistedChannel", objectMapper.writeValueAsString(new ArrayList<>()));
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
-        }
+        }*/
     }
 
     public static GuildConfig getGuildConfig(long guildId) {
@@ -63,7 +65,9 @@ public class GuildConfig {
     }
 
     public List<?> getConfigList(Configs config) {
-        if (!configs.containsKey(config.id)) return null;
+        if (!configs.containsKey(config.id)) {
+            return (List<?>) config.defaultValue;
+        }
 
         try {
             return objectMapper.readValue(configs.get(config.id), objectMapper.getTypeFactory().constructCollectionType(List.class, config.type));
@@ -94,7 +98,9 @@ public class GuildConfig {
     }
 
     public Object getConfig(Configs config) {
-        if (!configs.containsKey(config.id)) return null;
+        if (!configs.containsKey(config.id)) {
+            return config.defaultValue;
+        }
         return objectMapper.convertValue(configs.get(config.id), config.type);
     }
 

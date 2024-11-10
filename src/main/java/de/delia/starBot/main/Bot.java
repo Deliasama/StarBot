@@ -64,9 +64,9 @@ public class Bot {
 
         // Create Discord JDA Instance
         jda = JDABuilder.createDefault(token)
-                .disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE)
+                .disableCache(CacheFlag.MEMBER_OVERRIDES)
                 .setBulkDeleteSplittingEnabled(false)
-                .enableIntents(GatewayIntent.MESSAGE_CONTENT)
+                .enableIntents(GatewayIntent.MESSAGE_CONTENT, GatewayIntent.GUILD_VOICE_STATES)
                 .build();
 
         // Commands
