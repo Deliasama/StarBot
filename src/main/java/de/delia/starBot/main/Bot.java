@@ -1,6 +1,5 @@
 package de.delia.starBot.main;
 
-import de.delia.starBot.basics.TestCommand;
 import de.delia.starBot.commands.CommandManager;
 import de.delia.starBot.features.basics.InviteCommand;
 import de.delia.starBot.features.basics.StatusCommand;
@@ -74,7 +73,6 @@ public class Bot {
         // Commands
         commandManager = new CommandManager(this);
 
-        commandManager.registerCommand(TestCommand.class);
         commandManager.registerCommand(StatusCommand.class);
         commandManager.registerCommand(ConfigCommand.class);
         commandManager.registerCommand(InviteCommand.class);
