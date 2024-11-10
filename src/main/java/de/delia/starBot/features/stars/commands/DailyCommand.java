@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.utils.TimeFormat;
 import java.awt.*;
 import java.time.*;
 
-@ApplicationCommand(name = "daily", description = "Hole dir deine täglichen Sterne ab!")
+@ApplicationCommand(name = "daily", description = "Get your daily stars!")
 public class DailyCommand {
     @ApplicationCommandMethod
     public void onCommand(Bot bot, SlashCommandInteractionEvent event) {
@@ -59,11 +59,11 @@ public class DailyCommand {
                     .setColor(Color.cyan)
                     .setTitle("Daily")
                     .setTimestamp(Instant.now())
-                    .setDescription("Du hast **" + starsEarned + "** Sterne erhalten!\nStreak: **" + (daily.getStreak()-1) + "** :fire:");
+                    .setDescription("You earned **" + starsEarned + "** Stars!\nStreak: **" + (daily.getStreak()-1) + "** :fire:");
 
             event.replyEmbeds(embedBuilder.build()).queue();
         } else {
-            event.reply("Du musst bis " + TimeFormat.RELATIVE.after(Duration.between(LocalDateTime.now(), LocalDateTime.now().plusDays(1).with(LocalTime.of(0, 0, 1)))) + " warten!").setEphemeral(true).queue();
+            event.reply("You have to wait until " + TimeFormat.RELATIVE.after(Duration.between(LocalDateTime.now(), LocalDateTime.now().plusDays(1).with(LocalTime.of(0, 0, 1)))) + "!").setEphemeral(true).queue();
         }
     }
 }

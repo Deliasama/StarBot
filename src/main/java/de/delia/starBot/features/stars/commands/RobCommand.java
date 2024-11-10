@@ -19,17 +19,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
-@ApplicationCommand(name = "rob", description = "Stehle Sterne von anderen Mitspielern!")
+@ApplicationCommand(name = "rob", description = "Rob other Users!")
 public class RobCommand {
     Random random = new Random();
     static Map<String, Instant> cooldowns = new HashMap<>();
     Duration cooldownDuration = Duration.ofHours(6);
 
     @ApplicationCommandMethod
-    public void onCommand(Bot bot, SlashCommandInteractionEvent event, @Option(description = "spieler") User other) {
+    public void onCommand(Bot bot, SlashCommandInteractionEvent event, @Option(description = "Member to rob") User other) {
         if(cooldowns.containsKey(event.getMember().getId())) {
             if(!Instant.now().isAfter(cooldowns.get(event.getMember().getId()).plus(cooldownDuration))) {
-                event.reply("Du musst noch bis " + TimeFormat.RELATIVE.atInstant(cooldowns.get(event.getMember().getId()).plus(cooldownDuration)) + " warten!").setEphemeral(true).queue();
+                event.reply("You have to wait until " + TimeFormat.RELATIVE.atInstant(cooldowns.get(event.getMember().getId()).plus(cooldownDuration)) + " to rob again!").setEphemeral(true).queue();
                 return;
             }
         }
@@ -53,7 +53,7 @@ public class RobCommand {
                 .setAuthor(event.getMember().getUser().getName(), null, event.getMember().getUser().getAvatarUrl())
                 .setColor(Color.green)
                 .setTitle("Rob")
-                .setDescription(event.getMember().getUser().getAsMention() + " stehlt " + other.getAsMention() + " **" + toSteal + "** Sterne!")
+                .setDescription(event.getMember().getUser().getAsMention() + " steals " + other.getAsMention() + " **" + toSteal + "** Stars!")
                 .setTimestamp(Instant.now());
 
         event.replyEmbeds(builder.build()).queue();

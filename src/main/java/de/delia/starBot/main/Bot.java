@@ -7,6 +7,7 @@ import de.delia.starBot.features.basics.StatusCommand;
 import de.delia.starBot.features.stars.TradeManager;
 import de.delia.starBot.features.stars.commands.*;
 import de.delia.starBot.features.stars.listeners.ButtonInteractionListener;
+import de.delia.starBot.features.stars.listeners.VoiceStarsListeners;
 import de.delia.starBot.features.stars.menus.StarDropMenu;
 import de.delia.starBot.features.stars.listeners.MessageReceivedListener;
 import de.delia.starBot.features.stars.tables.*;
@@ -97,6 +98,7 @@ public class Bot {
         jda.addEventListener(new SlashCommandInteractionListener());
         jda.addEventListener(new GuildReadyListener());
         jda.addEventListener(new ButtonInteractionListener());
+        jda.addEventListener(new VoiceStarsListeners());
 
         System.out.println(jda.getInviteUrl(Permission.ADMINISTRATOR));
     }
