@@ -13,7 +13,6 @@ import de.delia.starBot.features.stars.tables.*;
 import de.delia.starBot.guildConfig.ConfigCommand;
 import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.listeners.GuildReadyListener;
-import de.delia.starBot.listeners.MessageListener;
 import de.delia.starBot.listeners.SlashCommandInteractionListener;
 import io.github.cdimascio.dotenv.Dotenv;
 import jakarta.persistence.EntityManagerFactory;
@@ -89,7 +88,6 @@ public class Bot {
         jda.addEventListener(new MessageReceivedListener());
         starDropMenu = new StarDropMenu(jda);
 
-        jda.addEventListener(new MessageListener());
         jda.addEventListener(new SlashCommandInteractionListener());
         jda.addEventListener(new GuildReadyListener());
         jda.addEventListener(new ButtonInteractionListener());
@@ -100,7 +98,7 @@ public class Bot {
 
     public void initTables() {
         if (entityManagerFactory == null) {
-            System.out.println("Datenbank fehler!");
+            System.err.println("Database error!");
             return;
         }
         starProfileTable = new StarProfileTable();
@@ -111,7 +109,6 @@ public class Bot {
         buildingTable = new BuildingEntity.BuildingTable();
 
         guildConfigTable = new GuildConfig.GuildConfigTable();
-
     }
 
     public EntityManagerFactory initDB() {
