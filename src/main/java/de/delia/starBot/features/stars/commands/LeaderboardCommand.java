@@ -13,13 +13,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import java.awt.*;
 import java.util.List;
 
-@ApplicationCommand(name = "leaderboard", description = "Zeige dir das Leaderboard an!")
+@ApplicationCommand(name = "leaderboard", description = "Shows the Server Leaderboard!")
 public class LeaderboardCommand {
 
     @ApplicationCommandMethod
-    public void onCommand(Bot bot, SlashCommandInteractionEvent event, @Option(isRequired = false, description = "bis welchen Platz") Integer depth) {
+    public void onCommand(Bot bot, SlashCommandInteractionEvent event, @Option(isRequired = false, description = "depth") Integer depth) {
         GuildConfig config = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
         if (depth == null) depth = 10;
+        if (depth > 20 || depth < 1) depth = 10;
+
         List<StarProfile> starProfiles = StarProfile.getTable().getSorted(event.getGuild().getIdLong(), depth, "u.stars");
 
         EmbedBuilder embedBuilder = new EmbedBuilder()

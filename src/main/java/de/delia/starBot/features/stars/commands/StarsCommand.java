@@ -11,7 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 
 import java.awt.*;
 
-@ApplicationCommand(name = "stars", description = "Zeige dir an wie viele Sterne du hast!")
+@ApplicationCommand(name = "stars", description = "Displays the amount of stars!")
 public class StarsCommand {
     @ApplicationCommandMethod
     public void command(Bot bot, SlashCommandInteractionEvent event, @Option(isRequired = false, description = "other Member") User other) {
@@ -24,7 +24,7 @@ public class StarsCommand {
                     .setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl())
                     .setColor(Color.cyan)
                     .setTitle("Stars")
-                    .setDescription("**" + member.getEffectiveName() + "** hat **" + profile.getStars() + "** Sterne!");
+                    .setDescription("**" + member.getEffectiveName() + "** has **" + profile.getStars() + "** stars!");
 
             event.replyEmbeds(embedBuilder.build()).queue();
         }, throwable -> {
