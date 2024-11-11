@@ -18,7 +18,7 @@ public class TownHall extends Building {
         super(1, "Townhall", Emoji.fromFormatted(":classical_building:"), buildingEntity.getGuildId(), buildingEntity.getMemberId(), buildingEntity.getLevel(), buildingEntity.getMetadata(), Map.of(
                 // 1. value: Building Level, 2. value: needed Townhall level, 3. value: price
                 2, new Integer[]{0, 100},
-                3, new Integer[]{0, 350},
+                3, new Integer[]{0, 400},
                 4, new Integer[]{0, 1000}
         ));
     }
