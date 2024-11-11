@@ -1,5 +1,6 @@
 package de.delia.starBot.guildConfig;
 
+import de.delia.starBot.main.Main;
 import de.delia.starBot.menus.EmbedMenu;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -68,10 +69,19 @@ public class GuildConfigMenu extends EmbedMenu {
                 GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
 
                 guildConfig.setConfig("enableStock", String.valueOf(!guildConfig.getConfig("enableStock", Boolean.class)));
-
                 guildConfig.update();
 
                 event.editMessageEmbeds(menu.getEmbed(event.getMember(), event.getGuild(), event.getChannel()).get().build()).queue();
+
+                // Logging
+                Main.INSTANCE.getLogChannel(event.getGuild().getIdLong()).ifPresent(channel -> {
+                    EmbedBuilder logEmbed = new EmbedBuilder()
+                            .setColor(Color.YELLOW)
+                            .setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl())
+                            .setTitle("Beta Stock Trading is now " + (guildConfig.getConfig("enableStock", Boolean.class) ? "enabled" : "disabled!"))
+                            .setTimestamp(Instant.now());
+                    channel.sendMessageEmbeds(logEmbed.build()).queue();
+                });
             });
             addBackButton();
         }
@@ -105,6 +115,16 @@ public class GuildConfigMenu extends EmbedMenu {
                 guildConfig.update();
 
                 event.editMessageEmbeds(menu.getEmbed(event.getMember(), event.getGuild(), event.getChannel()).get().build()).queue();
+
+                // Logging
+                Main.INSTANCE.getLogChannel(event.getGuild().getIdLong()).ifPresent(channel -> {
+                    EmbedBuilder logEmbed = new EmbedBuilder()
+                            .setColor(Color.blue)
+                            .setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl())
+                            .setTitle("StarDrop is now " + (guildConfig.getConfig("enableStarDrop", Boolean.class) ? "enabled" : "disabled!"))
+                            .setTimestamp(Instant.now());
+                    channel.sendMessageEmbeds(logEmbed.build()).queue();
+                });
             });
             addEntitySelectMenu(
                     EntitySelectMenu.create("settingStarDropBC", EntitySelectMenu.SelectTarget.CHANNEL)
@@ -123,7 +143,7 @@ public class GuildConfigMenu extends EmbedMenu {
 
                             if (e.getInteraction().getValues().isEmpty()) return;
 
-                            e.reply(e.getInteraction().getValues().get(e.getInteraction().getValues().size() - 1).getAsMention() + " is now Blacklisted!").queue();
+                            e.reply(e.getInteraction().getValues().get(e.getInteraction().getValues().size() - 1).getAsMention() + " is now Blacklisted!").setEphemeral(true).queue();
                         }
                     });
             addBackButton();
@@ -182,7 +202,6 @@ public class GuildConfigMenu extends EmbedMenu {
                             .setDefaultValues()
                             .build(), (event, menu) -> {
                         if (event instanceof EntitySelectInteractionEvent e) {
-                            System.out.println("aaaa");
                             // load Guild Config
                             GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
 
@@ -191,7 +210,7 @@ public class GuildConfigMenu extends EmbedMenu {
 
                             if (e.getInteraction().getValues().isEmpty()) return;
 
-                            e.reply(e.getInteraction().getValues().get(0).getAsMention() + " is now the new Log-Channel!").queue();
+                            e.reply(e.getInteraction().getValues().get(0).getAsMention() + " is now the new Log-Channel!").setEphemeral(true).queue();
                         }
                     });
             addBackButton();

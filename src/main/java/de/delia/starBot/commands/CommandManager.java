@@ -75,7 +75,6 @@ public class CommandManager {
             return mapping.getAsUser();
         }
         return null;
-
     }
 
     public Object mapOption(OptionMapping mapping) {

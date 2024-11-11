@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +111,20 @@ public abstract class Building implements Comparable<Building> {
             Main.INSTANCE.starProfileTable.update(starProfile);
             level++;
             save();
+
+            // Log it
+            Main.INSTANCE.getLogChannel(guildId).ifPresent(channel -> {
+                EmbedBuilder logEmbed = new EmbedBuilder()
+                        .setColor(Color.GREEN)
+                        .setAuthor(Main.INSTANCE.jda.getUserById(memberId).getEffectiveName(), null, Main.INSTANCE.jda.getUserById(memberId).getEffectiveAvatarUrl())
+                        .setTitle("Building upgraded!")
+                        .addField("Building:", this.getName(), false)
+                        .addField("Level:", (this.getLevel()-1) + " -> " + this.getLevel(), false)
+                        .setTimestamp(Instant.now());
+
+                channel.sendMessageEmbeds(logEmbed.build()).queue();
+            });
+
             return true;
         }
         return false;

@@ -11,6 +11,7 @@ import de.delia.starBot.features.stars.listeners.VoiceStarsListeners;
 import de.delia.starBot.features.stars.menus.StarDropMenu;
 import de.delia.starBot.features.stars.tables.*;
 import de.delia.starBot.guildConfig.ConfigCommand;
+import de.delia.starBot.guildConfig.Configs;
 import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.listeners.GuildReadyListener;
 import de.delia.starBot.listeners.SlashCommandInteractionListener;
@@ -20,6 +21,7 @@ import jakarta.persistence.Persistence;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
@@ -27,6 +29,7 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 public class Bot {
@@ -47,6 +50,9 @@ public class Bot {
 
     // Menus
     public StarDropMenu starDropMenu;
+
+    // Log channel
+    private Map<Long, Long> logChannel = new HashMap<>();
 
     public Bot(String token) {
         // get Project version
@@ -94,6 +100,23 @@ public class Bot {
         jda.addEventListener(new VoiceStarsListeners());
 
         System.out.println(jda.getInviteUrl(Permission.ADMINISTRATOR));
+    }
+
+    public Optional<TextChannel> getLogChannel(Long guildId) {
+        if (logChannel.containsKey(guildId)) return Optional.ofNullable(jda.getTextChannelById(logChannel.get(guildId)));
+
+        GuildConfig guildConfig = GuildConfig.getGuildConfig(guildId);
+        if(guildConfig == null) return Optional.empty();
+
+        if(!(boolean) guildConfig.getConfig(Configs.ENABLE_LOG))return Optional.empty();
+
+        Long channelId = (Long) guildConfig.getConfig(Configs.LOG_CHANNEL);
+        if(channelId == null) return Optional.empty();
+        TextChannel channel = jda.getTextChannelById(channelId);
+        if(channel == null) return Optional.empty();
+
+        logChannel.put(guildId, channelId);
+        return Optional.of(channel);
     }
 
     public void initTables() {
