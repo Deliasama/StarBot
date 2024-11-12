@@ -99,6 +99,7 @@ public abstract class Building implements Comparable<Building> {
         if (upgradeRequirements.containsKey(level + 1)) {
             TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, guildId, memberId);
             if (townHall == null) return false;
+
             if (!(townHall.getLevel() >= upgradeRequirements.get(level + 1)[0])) {
                 throw new UpgradeFailedException("You need to upgrade your townhall for that!");
             }
@@ -127,7 +128,7 @@ public abstract class Building implements Comparable<Building> {
 
             return true;
         }
-        return false;
+        throw new UpgradeFailedException("You have reached the maximum level at the moment!");
     }
 
     public MessageEmbed getEmbed() {

@@ -128,6 +128,7 @@ public class Command<T> {
             for (int i = 2; i < (options.size() + 2); i++) {
                 params[i] = commandManager.mapOption(event.getOption(options.get(i - 2).getName()));
             }
+
             method.invoke(object, params);
         }
     }

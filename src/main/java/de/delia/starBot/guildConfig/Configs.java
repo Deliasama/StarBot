@@ -13,6 +13,8 @@ public enum Configs {
 
     ENABLE_LOG("enableLog", Boolean.class, false),
     LOG_CHANNEL("logChannel", Long.class, null),
+
+    BIRTHDAY_CHANNEL("birthdayChannel", Long.class, null),
     ;
 
     public final String id;

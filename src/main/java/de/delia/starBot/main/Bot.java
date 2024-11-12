@@ -3,6 +3,9 @@ package de.delia.starBot.main;
 import de.delia.starBot.commands.CommandManager;
 import de.delia.starBot.features.basics.InviteCommand;
 import de.delia.starBot.features.basics.StatusCommand;
+import de.delia.starBot.features.birthday.BirthdayCommand;
+import de.delia.starBot.features.birthday.BirthdayManager;
+import de.delia.starBot.features.birthday.BirthdayTable;
 import de.delia.starBot.features.stars.TradeManager;
 import de.delia.starBot.features.stars.commands.*;
 import de.delia.starBot.features.stars.listeners.ButtonInteractionListener;
@@ -44,8 +47,11 @@ public class Bot {
     public Stock.StockTable stockTable;
     public Dividend.DividendTable dividendTable;
     public GuildConfig.GuildConfigTable guildConfigTable;
+    public BirthdayTable birthdayTable;
     public BuildingEntity.BuildingTable buildingTable;
 
+    // Managers
+    public BirthdayManager birthdayManager;
     public Map<Long, TradeManager> tradeManagers = new HashMap<>();
 
     // Menus
@@ -91,6 +97,8 @@ public class Bot {
         commandManager.registerCommand(TownCommand.class);
         commandManager.registerCommand(Visit.class);
 
+        commandManager.registerCommand(BirthdayCommand.class);
+
         jda.addEventListener(new MessageReceivedListener());
         starDropMenu = new StarDropMenu(jda);
 
@@ -98,6 +106,8 @@ public class Bot {
         jda.addEventListener(new GuildReadyListener());
         jda.addEventListener(new ButtonInteractionListener());
         jda.addEventListener(new VoiceStarsListeners());
+
+        birthdayManager = new BirthdayManager(this);
 
         System.out.println(jda.getInviteUrl(Permission.ADMINISTRATOR));
     }
@@ -132,6 +142,8 @@ public class Bot {
         buildingTable = new BuildingEntity.BuildingTable();
 
         guildConfigTable = new GuildConfig.GuildConfigTable();
+
+        birthdayTable = new BirthdayTable();
     }
 
     public EntityManagerFactory initDB() {

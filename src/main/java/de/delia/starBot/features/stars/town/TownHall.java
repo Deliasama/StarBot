@@ -11,7 +11,8 @@ public class TownHall extends Building {
 
     private static final Map<Class<? extends Building>, Integer> buildingUnlockTable = Map.of(
             Telescope.class, 2,
-            Wall.class, 2
+            Wall.class, 2,
+            Mine.class, 3
     );
 
     public TownHall(BuildingEntity buildingEntity) {
@@ -55,7 +56,10 @@ public class TownHall extends Building {
                         > Wall
                         > Telescope""";
             case 2:
-                return ":gem: Daily reward: **20 + 10 -> 30**";
+                return """
+                        :gem: Daily reward: **20 + 10 -> 30**
+                        :unlock: Unlocks:
+                        > Mine""";
             case 3:
                 return ":gem: Daily reward: **30 + 10 -> 40**";
         }
@@ -70,7 +74,7 @@ public class TownHall extends Building {
                 .forEach(entry -> {
                     Class<? extends Building> type = entry.getKey();
 
-                    if (!(buildings.stream().anyMatch(b -> b.getClass().equals(type)))) {
+                    if (buildings.stream().noneMatch(b -> b.getClass().equals(type))) {
                         Building building = Building.create(type, getGuildId(), getMemberId());
                         buildings.add(building);
                     }

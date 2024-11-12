@@ -82,7 +82,7 @@ public class MessageReceivedListener extends ListenerAdapter {
         Telescope telescope = (Telescope) Building.loadBuilding(Telescope.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
         double multiplier = 1;
         if (telescope != null) multiplier = 1.0 + (telescope.getLevel() * 0.5);
-        starProfile.addStars((int) (1.0 * Math.round(multiplier)));
+        starProfile.addStars((int) (Math.round(multiplier)));
 
         chatTimeout.put(event.getGuild().getId() + event.getMember().getId(), Instant.now().getEpochSecond());
     }
