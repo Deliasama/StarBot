@@ -57,8 +57,8 @@ public class Bot {
     // Menus
     public StarDropMenu starDropMenu;
 
-    // Log channel
-    private Map<Long, Long> logChannel = new HashMap<>();
+    // Discord Logger
+    public DiscordLogging discordLogging;
 
     public Bot(String token) {
         // get Project version
@@ -109,24 +109,9 @@ public class Bot {
 
         birthdayManager = new BirthdayManager(this);
 
+        discordLogging = new DiscordLogging(this);
+
         System.out.println(jda.getInviteUrl(Permission.ADMINISTRATOR));
-    }
-
-    public Optional<TextChannel> getLogChannel(Long guildId) {
-        if (logChannel.containsKey(guildId)) return Optional.ofNullable(jda.getTextChannelById(logChannel.get(guildId)));
-
-        GuildConfig guildConfig = GuildConfig.getGuildConfig(guildId);
-        if(guildConfig == null) return Optional.empty();
-
-        if(!(boolean) guildConfig.getConfig(Configs.ENABLE_LOG))return Optional.empty();
-
-        Long channelId = (Long) guildConfig.getConfig(Configs.LOG_CHANNEL);
-        if(channelId == null) return Optional.empty();
-        TextChannel channel = jda.getTextChannelById(channelId);
-        if(channel == null) return Optional.empty();
-
-        logChannel.put(guildId, channelId);
-        return Optional.of(channel);
     }
 
     public void initTables() {

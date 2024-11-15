@@ -2,11 +2,13 @@ package de.delia.starBot.features.stars.town;
 
 import de.delia.starBot.features.stars.tables.BuildingEntity;
 import de.delia.starBot.features.stars.tables.StarProfile;
+import de.delia.starBot.main.DiscordLogging;
 import de.delia.starBot.main.Main;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import org.jetbrains.annotations.NotNull;
@@ -114,17 +116,7 @@ public abstract class Building implements Comparable<Building> {
             save();
 
             // Log it
-            Main.INSTANCE.getLogChannel(guildId).ifPresent(channel -> {
-                EmbedBuilder logEmbed = new EmbedBuilder()
-                        .setColor(Color.GREEN)
-                        .setAuthor(Main.INSTANCE.jda.getUserById(memberId).getEffectiveName(), null, Main.INSTANCE.jda.getUserById(memberId).getEffectiveAvatarUrl())
-                        .setTitle("Building upgraded!")
-                        .addField("Building:", this.getName(), false)
-                        .addField("Level:", (this.getLevel()-1) + " -> " + this.getLevel(), false)
-                        .setTimestamp(Instant.now());
-
-                channel.sendMessageEmbeds(logEmbed.build()).queue();
-            });
+            Main.INSTANCE.discordLogging.log(guildId, DiscordLogging.LoggingType.INFO, "Building Upgraded", UserSnowflake.fromId(memberId).getAsMention() + " upgraded Building (" + getName() + ") to level " + level + "!");
 
             return true;
         }

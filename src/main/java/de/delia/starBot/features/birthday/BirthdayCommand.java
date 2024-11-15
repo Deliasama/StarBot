@@ -5,6 +5,7 @@ import de.delia.starBot.commands.ApplicationCommandMethod;
 import de.delia.starBot.commands.ApplicationCommandPermission;
 import de.delia.starBot.commands.Option;
 import de.delia.starBot.main.Bot;
+import de.delia.starBot.main.DiscordLogging;
 import de.delia.starBot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -57,18 +58,8 @@ public class BirthdayCommand {
             event.reply("Birthday set to "+ TimeFormat.DATE_LONG.atInstant(date.atStartOfDay(ZoneId.systemDefault()).toInstant()) + "!").setEphemeral(true).queue();
 
             // LOGGING
-            bot.getLogChannel(event.getGuild().getIdLong()).ifPresent(channel -> {
-                EmbedBuilder logEmbed = new EmbedBuilder()
-                        .setColor(Color.GREEN)
-                        .setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl())
-                        .setTitle("Birthday changed!")
-                        .addField("New birthday", String.valueOf(TimeFormat.DATE_LONG.atInstant(date.atStartOfDay(ZoneId.systemDefault()).toInstant())), false)
-                        .setTimestamp(Instant.now());
-
-                channel.sendMessageEmbeds(logEmbed.build()).queue();
-            });
-
-
+            bot.discordLogging.log(event.getGuild().getIdLong(), DiscordLogging.LoggingType.INFO, "Changed birthday",
+                    event.getMember().getAsMention() + " changed their birthday date to: " + TimeFormat.DATE_LONG.atInstant(date.atStartOfDay(ZoneId.systemDefault()).toInstant()) + "!");
         }
     }
 
@@ -83,15 +74,7 @@ public class BirthdayCommand {
             event.reply("Deleted Birthday!").setEphemeral(true).queue();
 
             // LOGGING
-            bot.getLogChannel(event.getGuild().getIdLong()).ifPresent(channel -> {
-                EmbedBuilder logEmbed = new EmbedBuilder()
-                        .setColor(Color.GREEN)
-                        .setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl())
-                        .setTitle("Birthday deleted!")
-                        .setTimestamp(Instant.now());
-
-                channel.sendMessageEmbeds(logEmbed.build()).queue();
-            });
+            bot.discordLogging.log(event.getGuild().getIdLong(), DiscordLogging.LoggingType.INFO, "Deleted Birthday", event.getMember().getAsMention() + " deleted their Birthday!");
         }
     }
 

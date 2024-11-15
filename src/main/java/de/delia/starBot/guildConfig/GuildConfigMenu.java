@@ -1,5 +1,6 @@
 package de.delia.starBot.guildConfig;
 
+import de.delia.starBot.main.DiscordLogging;
 import de.delia.starBot.main.Main;
 import de.delia.starBot.menus.EmbedMenu;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -38,6 +39,9 @@ public class GuildConfigMenu extends EmbedMenu {
         // Log Config
         addSubMenu(new LogSettingsMenu(this));
 
+        // Birthday Config
+        addSubMenu(new BirthdayMenu(this));
+
         addEventListener(jda);
     }
 
@@ -74,14 +78,8 @@ public class GuildConfigMenu extends EmbedMenu {
                 event.editMessageEmbeds(menu.getEmbed(event.getMember(), event.getGuild(), event.getChannel()).get().build()).queue();
 
                 // Logging
-                Main.INSTANCE.getLogChannel(event.getGuild().getIdLong()).ifPresent(channel -> {
-                    EmbedBuilder logEmbed = new EmbedBuilder()
-                            .setColor(Color.YELLOW)
-                            .setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl())
-                            .setTitle("Beta Stock Trading is now " + (guildConfig.getConfig("enableStock", Boolean.class) ? "enabled" : "disabled!"))
-                            .setTimestamp(Instant.now());
-                    channel.sendMessageEmbeds(logEmbed.build()).queue();
-                });
+                Main.INSTANCE.discordLogging.log(event.getGuild().getIdLong(), DiscordLogging.LoggingType.WARN, "Config changed",
+                        event.getMember().getAsMention() + (guildConfig.getConfig("enableStock", Boolean.class) ? " enabled" : " disabled") + " Beta Stock Trading!");
             });
             addBackButton();
         }
@@ -117,14 +115,8 @@ public class GuildConfigMenu extends EmbedMenu {
                 event.editMessageEmbeds(menu.getEmbed(event.getMember(), event.getGuild(), event.getChannel()).get().build()).queue();
 
                 // Logging
-                Main.INSTANCE.getLogChannel(event.getGuild().getIdLong()).ifPresent(channel -> {
-                    EmbedBuilder logEmbed = new EmbedBuilder()
-                            .setColor(Color.blue)
-                            .setAuthor(event.getMember().getEffectiveName(), null, event.getMember().getEffectiveAvatarUrl())
-                            .setTitle("StarDrop is now " + (guildConfig.getConfig("enableStarDrop", Boolean.class) ? "enabled" : "disabled!"))
-                            .setTimestamp(Instant.now());
-                    channel.sendMessageEmbeds(logEmbed.build()).queue();
-                });
+                Main.INSTANCE.discordLogging.log(event.getGuild().getIdLong(), DiscordLogging.LoggingType.WARN, "Config changed",
+                        event.getMember().getAsMention() + (guildConfig.getConfig("enableStock", Boolean.class) ? " enabled" : " disabled") + " StarDrops!");
             });
             addEntitySelectMenu(
                     EntitySelectMenu.create("settingStarDropBC", EntitySelectMenu.SelectTarget.CHANNEL)
@@ -207,6 +199,7 @@ public class GuildConfigMenu extends EmbedMenu {
 
                             guildConfig.setConfig(Configs.LOG_CHANNEL, String.valueOf(e.getValues().get(0).getIdLong()));
                             guildConfig.update();
+                            Main.INSTANCE.discordLogging.updateLogChannel(event.getGuild().getIdLong(), e.getValues().get(0).getIdLong());
 
                             if (e.getInteraction().getValues().isEmpty()) return;
 
@@ -221,6 +214,64 @@ public class GuildConfigMenu extends EmbedMenu {
             GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
 
             Long channelId = (Long) guildConfig.getConfig(Configs.LOG_CHANNEL);
+
+            if(channelId != null) {
+                TextChannel channel = event.getGuild().getTextChannelById(channelId);
+                if(channel != null) {
+                    EntitySelectMenu.DefaultValue value = EntitySelectMenu.DefaultValue.channel(channelId);
+                    setSelectMenu(((EntitySelectMenu) getSelectMenu()).createCopy().setDefaultValues(value).build());
+                }
+            }
+        }
+    }
+
+    public static class BirthdayMenu extends EmbedMenu {
+        public BirthdayMenu(EmbedMenu parent) {
+            super("Birthday", parent);
+
+            addEmbedFunction(e -> {
+                // load Guild Config
+                GuildConfig guildConfig = GuildConfig.getGuildConfig(e.getGuild().getIdLong());
+
+                EmbedBuilder embedBuilder = new EmbedBuilder()
+                        .setAuthor(e.getMember().getEffectiveName(), null, e.getMember().getUser().getEffectiveAvatarUrl())
+                        .setTitle("**Birthday Settings**")
+                        .setColor(Color.CYAN)
+                        .addField(":gear: Birthday-Channel", "Change the Channel where birthdays get mentioned!", false)
+                        .setFooter("Green = Enabled, Red = Disabled")
+                        .setTimestamp(Instant.now());
+
+                return embedBuilder;
+            });
+
+            addEntitySelectMenu(
+                    EntitySelectMenu.create("settingBirthdayChannel", EntitySelectMenu.SelectTarget.CHANNEL)
+                            .setChannelTypes(ChannelType.TEXT)
+                            .setMaxValues(1)
+                            .setMinValues(1)
+                            .setPlaceholder("Birthday Channel")
+                            .setDefaultValues()
+                            .build(), (event, menu) -> {
+                        if (event instanceof EntitySelectInteractionEvent e) {
+                            // load Guild Config
+                            GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
+
+                            guildConfig.setConfig(Configs.BIRTHDAY_CHANNEL, String.valueOf(e.getValues().get(0).getIdLong()));
+                            guildConfig.update();
+
+                            if (e.getInteraction().getValues().isEmpty()) return;
+
+                            e.reply(e.getInteraction().getValues().get(0).getAsMention() + " is now the new Birthday-Channel!").setEphemeral(true).queue();
+                        }
+                    });
+            addBackButton();
+        }
+
+        @Override
+        public void onMenuGenerate(OpenEmbedMenuEvent event) {
+            GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
+
+            Long channelId = (Long) guildConfig.getConfig(Configs.BIRTHDAY_CHANNEL);
 
             if(channelId != null) {
                 TextChannel channel = event.getGuild().getTextChannelById(channelId);
