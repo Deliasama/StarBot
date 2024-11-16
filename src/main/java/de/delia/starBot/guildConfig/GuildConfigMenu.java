@@ -9,9 +9,14 @@ import net.dv8tion.jda.api.entities.IMentionable;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 
 import java.awt.*;
 import java.time.Instant;
@@ -137,6 +142,38 @@ public class GuildConfigMenu extends EmbedMenu {
 
                             e.reply(e.getInteraction().getValues().get(e.getInteraction().getValues().size() - 1).getAsMention() + " is now Blacklisted!").setEphemeral(true).queue();
                         }
+                    });
+            addButton(Button.primary("changeStarDropRarity", "Set StarDrop rarity"), (event, menu) -> {
+                getModal("starDropRarity").ifPresent(m -> {
+                    event.replyModal(m).queue();
+                });
+            });
+            addModal(
+                    Modal.create("starDropRarity", "Set StarDrop rarity")
+                            .addComponents(
+                                    ActionRow.of(TextInput.create("minMessages", "Min-Messages", TextInputStyle.SHORT).setMinLength(1).setMaxLength(3).setRequired(true).build()),
+                                    ActionRow.of(TextInput.create("maxMessages", "Max-Messages", TextInputStyle.SHORT).setMinLength(1).setMaxLength(4).setRequired(true).build())
+                            )
+                            .build(), (e, m) -> {
+                        int minStars = Integer.parseInt(e.getValue("minMessages").getAsString());
+                        int maxStars = Integer.parseInt(e.getValue("maxMessages").getAsString());
+
+                        if (minStars <= 0 || maxStars <=0 || minStars > maxStars) {
+                            e.reply("Please check your inputs and try it again!").setEphemeral(true).queue();
+                            return;
+                        }
+                        // load Guild Config
+                        GuildConfig guildConfig = GuildConfig.getGuildConfig(e.getGuild().getIdLong());
+                        guildConfig.setConfig(Configs.STAR_DROP_MESSAGE_MIN, String.valueOf(minStars));
+                        guildConfig.setConfig(Configs.STAR_DROP_MESSAGE_MAX, String.valueOf(maxStars));
+                        guildConfig.update();
+
+                        e.editMessageEmbeds(m.getEmbed(e.getMember(), e.getGuild(), e.getChannel()).get().build()).queue();
+
+                        // Logging
+                        Main.INSTANCE.discordLogging.log(e.getGuild().getIdLong(), DiscordLogging.LoggingType.WARN, "Config changed",
+                                e.getMember().getAsMention() + " set StarDrop rarity: **" + minStars + "** to **" + maxStars + "**");
+
                     });
             addBackButton();
         }

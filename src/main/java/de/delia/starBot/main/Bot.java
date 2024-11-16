@@ -14,7 +14,6 @@ import de.delia.starBot.features.stars.listeners.VoiceStarsListeners;
 import de.delia.starBot.features.stars.menus.StarDropMenu;
 import de.delia.starBot.features.stars.tables.*;
 import de.delia.starBot.guildConfig.ConfigCommand;
-import de.delia.starBot.guildConfig.Configs;
 import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.listeners.GuildReadyListener;
 import de.delia.starBot.listeners.SlashCommandInteractionListener;
@@ -24,7 +23,6 @@ import jakarta.persistence.Persistence;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
@@ -32,7 +30,6 @@ import java.io.IOException;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 
 public class Bot {

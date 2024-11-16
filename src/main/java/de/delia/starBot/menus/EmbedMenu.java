@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.GenericSelectMenuInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
@@ -19,6 +20,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.selections.StringSelectMenu;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -37,6 +39,8 @@ public class EmbedMenu extends ListenerAdapter {
     @Setter
     private SelectMenu selectMenu = null;
     private Function<OpenEmbedMenuEvent, EmbedBuilder> embedFunction;
+    private List<Modal> modals = new ArrayList<>();
+    private Map<String, BiConsumer<ModalInteractionEvent, EmbedMenu>> modalEvents = new HashMap<>();
 
     public EmbedMenu(String name, EmbedMenu parent) {
         this.name = name;
@@ -74,6 +78,12 @@ public class EmbedMenu extends ListenerAdapter {
             EmbedMenuResponse embedMenuResponse = getParent().generate(e.getMember(), e.getGuild(), e.getChannel());
             e.editMessageEmbeds(embedMenuResponse.embed).setComponents(embedMenuResponse.actionRows).queue();
         });
+        return this;
+    }
+
+    public EmbedMenu addModal(Modal modal, BiConsumer<ModalInteractionEvent, EmbedMenu> event) {
+        modals.add(modal.createCopy().setId(getId() + ":" + modal.getId()).build());
+        modalEvents.put(getId() + ":" + modal.getId(), event);
         return this;
     }
 
@@ -119,6 +129,10 @@ public class EmbedMenu extends ListenerAdapter {
         return new ArrayList<>(components);
     }
 
+    public Optional<Modal> getModal(String id) {
+        return modals.stream().filter(m -> m.getId().split(":")[m.getId().split(":").length-1].equals(id)).findAny();
+    }
+
     public void addEventListener(JDA jda) {
         jda.addEventListener(this);
     }
@@ -161,6 +175,10 @@ public class EmbedMenu extends ListenerAdapter {
     }
 
     public void onMenuButtonInteraction(MenuButtonInteractionEvent event) {
+    }
+
+    public void onMenuModalInteraction(ModalInteractionEvent event) {
+
     }
 
     @Override
@@ -213,6 +231,26 @@ public class EmbedMenu extends ListenerAdapter {
                 EmbedMenuResponse embedMenuResponse = subMenu.generate(event.getMember(), event.getGuild(), event.getChannel());
                 event.editMessageEmbeds(embedMenuResponse.embed).setComponents(embedMenuResponse.actionRows).queue();
                 return;
+            }
+        }
+    }
+
+    @Override
+    public void onModalInteraction(@NotNull ModalInteractionEvent event) {
+        if (!event.getModalId().startsWith(getId())) return;
+        String modalId = event.getModalId();
+
+        String menuId = modalId.substring(0, modalId.lastIndexOf(':'));
+        EmbedMenu menu = getSubMenuWithId(menuId);
+        if (menu == null) return;
+
+        onMenuModalInteraction(event);
+
+        for (Modal modal : menu.modals) {
+            if (modal.getId().equals(modalId)) {
+                if(menu.modalEvents.containsKey(modal.getId())) {
+                    menu.modalEvents.get(modal.getId()).accept(event, menu);
+                }
             }
         }
     }
