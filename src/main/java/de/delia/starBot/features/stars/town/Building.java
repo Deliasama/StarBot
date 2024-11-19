@@ -11,6 +11,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -131,6 +133,10 @@ public abstract class Building implements Comparable<Building> {
                 .addField(":arrow_double_up: Upgrade (" + upgradeRequirements.get(level + 1)[1] + " Stars)", getUpgradeText(), false);
 
         return embedBuilder.build();
+    }
+
+    public ActionRow getActionRow() {
+        return null;
     }
 
     public abstract void readMetaData(String metaData);

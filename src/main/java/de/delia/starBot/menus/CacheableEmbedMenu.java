@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class CacheableEmbedMenu extends EmbedMenu {
     public static final long DEFAULT_CACHE_TTL = 10 * 60 * 1000;
@@ -26,6 +27,13 @@ public class CacheableEmbedMenu extends EmbedMenu {
 
     public EmbedMenuInstance<? extends CacheableEmbedMenu> getInstance(String id) {
         return instanceCache.get(id);
+    }
+
+    public boolean ifInstanceNotExpired(String id, long ttl, Consumer<EmbedMenuInstance<? extends CacheableEmbedMenu>> callback) {
+        EmbedMenuInstance<? extends CacheableEmbedMenu> instance = getInstance(id);
+        if (instance == null || instance.isExpired(ttl)) return false;
+        callback.accept(instance);
+        return true;
     }
 
     @Override
@@ -44,7 +52,7 @@ public class CacheableEmbedMenu extends EmbedMenu {
         if (navigator != null) actionRows.add(ActionRow.of(getNavigator()));
         EmbedMenuResponse embedMenuResponse = new EmbedMenuResponse(embed.build(), actionRows, channel, member, guild);
 
-        newInstance(id, new EmbedMenuInstance<>(this, member, guild, embed, actionRows, Instant.now().getEpochSecond()));
+        newInstance(id, new EmbedMenuInstance<>(this, member, guild, embed, actionRows, System.currentTimeMillis() / 1000 * 1000));
         return embedMenuResponse;
     }
 

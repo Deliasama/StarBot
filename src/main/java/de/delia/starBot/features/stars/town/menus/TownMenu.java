@@ -59,9 +59,10 @@ public class TownMenu extends CacheableEmbedMenu {
         String value = event.getInteraction().getValues().get(0);
 
         TownMenuInstance<TownMenu> townMenuInstance = (TownMenuInstance<TownMenu>) getInstance(generateCacheKey(event.getMember(), event.getGuild()));
-        if (townMenuInstance == null || townMenuInstance.isExpired(Instant.now().getEpochSecond()))
-            regenerate(event.getMember(), event.getGuild(), event.getChannel());
-        townMenuInstance = (TownMenuInstance<TownMenu>) getInstance(generateCacheKey(event.getMember(), event.getGuild()));
+        if (townMenuInstance == null || townMenuInstance.isExpired(10 * 60 * 1000)) {
+            event.reply("This Menu is expired!!").setEphemeral(true).queue();
+            return;
+        }
 
         for (Building building : townMenuInstance.getBuildings()) {
             if (building.getName().equals(value)) {
@@ -71,6 +72,7 @@ public class TownMenu extends CacheableEmbedMenu {
                 List<ItemComponent> components = actionRows.get(0).getComponents();
                 components.add(Button.success(getId() + ":upgrade:" + building.getName(), Emoji.fromUnicode("U+23EB")));
                 actionRows.set(0, ActionRow.of(components));
+                if (building.getActionRow() != null) actionRows.add(building.getActionRow());
 
                 actionRows.add(ActionRow.of(getCustomNavigator(townMenuInstance.buildings)));
 
@@ -109,7 +111,7 @@ public class TownMenu extends CacheableEmbedMenu {
 
         EmbedBuilder embedBuilder = getEmbed(member, guild, channel, buildings);
 
-        newInstance(generateCacheKey(member, guild), new TownMenuInstance<>(this, member, guild, embedBuilder, Collections.singletonList(ActionRow.of(getCustomNavigator(buildings))), Instant.now().getEpochSecond(), townHall, buildings));
+        newInstance(generateCacheKey(member, guild), new TownMenuInstance<>(this, member, guild, embedBuilder, Collections.singletonList(ActionRow.of(getCustomNavigator(buildings))), System.currentTimeMillis(), townHall, buildings));
 
         return new EmbedMenuResponse(embedBuilder.build(), Collections.singletonList(ActionRow.of(getCustomNavigator(buildings))), channel, member, guild);
     }
@@ -127,11 +129,12 @@ public class TownMenu extends CacheableEmbedMenu {
     }
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        System.out.println(event.getButton().getId());
         if (event.getButton().getId().startsWith(getId() + ":upgrade")) {
             String value = event.getButton().getId().split(":")[event.getButton().getId().split(":").length - 1];
 
             EmbedMenuInstance<?> instance = getInstance(generateCacheKey(event.getMember(), event.getGuild()));
-            if (instance == null || instance.isExpired(Instant.now().getEpochSecond())) {
+            if (instance == null || instance.isExpired(DEFAULT_CACHE_TTL)) {
                 regenerate(event.getMember(), event.getGuild(), event.getChannel());
                 instance = getInstance(generateCacheKey(event.getMember(), event.getGuild()));
             }
@@ -155,6 +158,20 @@ public class TownMenu extends CacheableEmbedMenu {
                     }
                 }
             }
+        }
+        if (event.getButton().getId().startsWith(getId() + ":buildings")) {
+            String buildingName = event.getButton().getId().split(":")[event.getButton().getId().split(":").length - 2];
+            String id = event.getButton().getId().split(":")[event.getButton().getId().split(":").length - 1];
+
+            EmbedMenuInstance<?> instance = getInstance(generateCacheKey(event.getMember(), event.getGuild()));
+            if (instance == null || instance.isExpired(DEFAULT_CACHE_TTL)) {
+                event.reply("This Menu expired!").setEphemeral(true).queue();
+                return;
+            }
+            if (!(instance instanceof TownMenuInstance<?> townMenuInstance)) return;
+            townMenuInstance.getBuildings().stream().filter(building -> building.getName().equals(buildingName)).findFirst().ifPresent(building -> {
+                building.onButtonInteraction(event, id);
+            });
         }
         super.onButtonInteraction(event);
     }
@@ -182,24 +199,6 @@ public class TownMenu extends CacheableEmbedMenu {
 
         public StringSelectMenu getNavigator() {
             return null;
-        }
-
-        @Override
-        public void onMenuButtonInteraction(MenuButtonInteractionEvent event) {
-            if (event == null) return;
-            if (event.getEvent().getButton().getId().equals(getId() + ":back")) return;
-            String[] args = event.getEvent().getButton().getId().split(":");
-            String name = args[args.length - 2];
-            try {
-                Class<? extends Building> type = (Class<? extends Building>) Class.forName(name);
-                Building building = Building.loadBuilding(type, event.getEvent().getGuild().getIdLong(), event.getEvent().getMember().getIdLong());
-
-                if (building == null) return;
-
-                building.onButtonInteraction(event.getEvent(), args[args.length - 1]);
-            } catch (ClassNotFoundException e) {
-                throw new RuntimeException(e);
-            }
         }
     }
 }
