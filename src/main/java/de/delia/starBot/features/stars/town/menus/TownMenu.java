@@ -129,7 +129,6 @@ public class TownMenu extends CacheableEmbedMenu {
     }
 
     public void onButtonInteraction(ButtonInteractionEvent event) {
-        System.out.println(event.getButton().getId());
         if (event.getButton().getId().startsWith(getId() + ":upgrade")) {
             String value = event.getButton().getId().split(":")[event.getButton().getId().split(":").length - 1];
 
