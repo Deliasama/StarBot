@@ -11,14 +11,13 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -138,6 +137,9 @@ public abstract class Building implements Comparable<Building> {
 
     public ActionRow getActionRow() {
         return null;
+    }
+
+    public void onModalInteraction(ModalInteractionEvent event, String id, EmbedMenu menu) {
     }
 
     public abstract void readMetaData(String metaData);

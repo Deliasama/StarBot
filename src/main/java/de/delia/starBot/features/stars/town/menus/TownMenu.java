@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.StringSelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -173,6 +174,25 @@ public class TownMenu extends CacheableEmbedMenu {
             });
         }
         super.onButtonInteraction(event);
+    }
+
+    @Override
+    public void onModalInteraction(ModalInteractionEvent event) {
+        if (event.getModalId().startsWith(getId() + ":buildings")) {
+            String buildingName = event.getModalId().split(":")[event.getModalId().split(":").length - 2];
+            String id = event.getModalId().split(":")[event.getModalId().split(":").length - 1];
+
+            EmbedMenuInstance<?> instance = getInstance(generateCacheKey(event.getMember(), event.getGuild()));
+            if (instance == null || instance.isExpired(DEFAULT_CACHE_TTL)) {
+                event.reply("This Menu expired!").setEphemeral(true).queue();
+                return;
+            }
+            if (!(instance instanceof TownMenuInstance<?> townMenuInstance)) return;
+            townMenuInstance.getBuildings().stream().filter(building -> building.getName().equals(buildingName)).findFirst().ifPresent(building -> {
+                building.onModalInteraction(event, id, this);
+            });
+
+        }
     }
 
 

@@ -5,13 +5,18 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.delia.starBot.features.stars.tables.BuildingEntity;
-import de.delia.starBot.menus.CacheableEmbedMenu;
 import de.delia.starBot.menus.EmbedMenu;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.interactions.components.text.TextInput;
+import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
+import net.dv8tion.jda.api.interactions.modals.Modal;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class Mine extends Building {
@@ -21,6 +26,12 @@ public class Mine extends Building {
     int pickaxeCount = 0;
     final int MINE_WIDTH = 7;
     final int MINE_HEIGHT = 9;
+
+    private static final Modal mineModal = Modal.create("embedMenu:town:buildings:Mine:mineModal", "Mine")
+            .addActionRow(TextInput.create("x-coordinate", "x-coordinate", TextInputStyle.SHORT).setMaxLength(1).setPlaceholder("3").build())
+            .addActionRow(TextInput.create("y-coordinate", "y-coordinate", TextInputStyle.SHORT).setMaxLength(1).setPlaceholder("6").build())
+            .build();
+
 
     public Mine(BuildingEntity entity) {
         super(4, "Mine", Emoji.fromFormatted(":hammer_pick:"), entity.getGuildId(), entity.getMemberId(), entity.getLevel(), entity.getMetadata(), Map.of(
@@ -82,12 +93,20 @@ public class Mine extends Building {
     public void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id, EmbedMenu menu) {
         if (id.equals("mine")) {
             pickaxeCount++;
+            buttonInteractionEvent.replyModal(mineModal).queue();
+        }
+    }
+
+    public void onModalInteraction(ModalInteractionEvent event, String id, EmbedMenu menu) {
+        if (id.equals("mineModal")) {
+            int x = Integer.parseInt(event.getValue("x-coordinate").getAsString()) - 1;
+            int y = Integer.parseInt(event.getValue("y-coordinate").getAsString()) - 1;
+
             try {
-                Ores ore = mineOre(3, 1);
-                buttonInteractionEvent.reply(ore.name()).queue();
-                buttonInteractionEvent.getMessage().editMessageEmbeds(this.getEmbed()).queue();
+                Ores minedOre = mineOre(x, y);
+                event.editMessageEmbeds(this.getEmbed()).queue();
             } catch (MineException e) {
-                throw new RuntimeException(e);
+                event.reply(e.getMessage()).queue();
             }
         }
     }
@@ -95,12 +114,15 @@ public class Mine extends Building {
     @Override
     public String getDescription() {
         StringBuilder description = new StringBuilder();
+
+        // Simple mine visualization for testing purposes
         for (int y = MINE_HEIGHT-1; y >= 0; y--) {
             description.append(y).append(":");
             for (int x = 0; x < MINE_WIDTH; x++) {
                 description.append(" | ");
-                if (ores[x][y] == Ores.STONE) description.append("s");
-                if (ores[x][y] == Ores.COAL) description.append("c");
+                if (ores[x][y] == Ores.AIR) description.append(" ");
+                if (ores[x][y] == Ores.STONE) description.append("S");
+                if (ores[x][y] == Ores.COAL) description.append("C");
             }
             description.append("\n");
         }
@@ -113,17 +135,24 @@ public class Mine extends Building {
     }
 
     public Ores mineOre(int x, int y) throws MineException {
-        System.out.println("x: " + x + ", y: " + y);
         if (this.ores == null) generateMine();
         if (x < 0 || y < 0 || x >= MINE_WIDTH || y >= MINE_HEIGHT) {
-            throw new MineException("Invalid coordinates");
+            throw new MineException("Invalid coordinates!");
         }
         if (this.pickaxeCount <= 0) {
             throw new MineException("You don't have a pickaxe!");
         }
+        // checks if the mined ore is on the surface or else check if air is next by
+        if (y != (MINE_HEIGHT-1)) {
+            List<Ores> neighbours = new ArrayList<>();
+            if (y-1 >= 0) neighbours.add(ores[x][y-1]);
+            neighbours.add(ores[x][y+1]);
+            if (x-1 >= 0) neighbours.add(ores[x-1][y]);
+            if (x+1 < MINE_WIDTH) neighbours.add(ores[x+1][y]);
+            if (!neighbours.contains(Ores.AIR)) throw new MineException("Unreachable Ore!");
+        }
         if (this.ores[x][y] != null && this.ores[x][y] != Ores.AIR) {
             Ores ore = ores[x][y];
-            System.out.println(ore);
             ores[x][y] = Ores.AIR;
             pickaxeCount--;
 
@@ -153,6 +182,7 @@ public class Mine extends Building {
 
     private Ores[] generateMineRow(int depth) {
         Ores[] ores = new Ores[MINE_WIDTH];
+        // TODO real ore generation
         for (int i = 0; i < MINE_WIDTH; i++) {
             if (depth % 2 == 0) {
                 ores[i] = Ores.STONE;
