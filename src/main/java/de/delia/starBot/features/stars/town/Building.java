@@ -4,6 +4,7 @@ import de.delia.starBot.features.stars.tables.BuildingEntity;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.main.DiscordLogging;
 import de.delia.starBot.main.Main;
+import de.delia.starBot.menus.EmbedMenu;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -143,7 +144,7 @@ public abstract class Building implements Comparable<Building> {
 
     public abstract String writeMetaData();
 
-    public abstract void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id);
+    public abstract void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id, EmbedMenu menu);
 
     public abstract String getDescription();
 

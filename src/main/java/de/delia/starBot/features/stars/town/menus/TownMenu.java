@@ -169,7 +169,7 @@ public class TownMenu extends CacheableEmbedMenu {
             }
             if (!(instance instanceof TownMenuInstance<?> townMenuInstance)) return;
             townMenuInstance.getBuildings().stream().filter(building -> building.getName().equals(buildingName)).findFirst().ifPresent(building -> {
-                building.onButtonInteraction(event, id);
+                building.onButtonInteraction(event, id, this);
             });
         }
         super.onButtonInteraction(event);
