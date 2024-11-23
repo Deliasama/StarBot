@@ -123,6 +123,8 @@ public class Mine extends Building {
                 if (ores[x][y] == Ores.AIR) description.append(" ");
                 if (ores[x][y] == Ores.STONE) description.append("S");
                 if (ores[x][y] == Ores.COAL) description.append("C");
+                if (ores[x][y] == Ores.IRON) description.append("I");
+                if (ores[x][y] == Ores.GOLD) description.append("G");
             }
             description.append("\n");
         }
@@ -135,6 +137,7 @@ public class Mine extends Building {
     }
 
     public Ores mineOre(int x, int y) throws MineException {
+        // if (getLevel() < 1) throw new MineException("You need at least level 1!");
         if (this.ores == null) generateMine();
         if (x < 0 || y < 0 || x >= MINE_WIDTH || y >= MINE_HEIGHT) {
             throw new MineException("Invalid coordinates!");
@@ -158,6 +161,10 @@ public class Mine extends Building {
 
             // shift the mine one up and add 1 to the depth if the 2. lowest ore is mined
             if (y <= 1) {
+                if (depth+1 > getLevel()*20) {
+                    pickaxeCount++;
+                    throw new MineException("Maximal depth reached!");
+                }
                 depth++;
                 shiftMineUp(generateMineRow(depth));
             }
@@ -180,26 +187,36 @@ public class Mine extends Building {
         }
     }
 
+    // generates a row of ores based on the depth
     private Ores[] generateMineRow(int depth) {
         Ores[] ores = new Ores[MINE_WIDTH];
-        // TODO real ore generation
+        double total = 0.0d;
+        for (Ores ore : Ores.values()) total += ore.getProbability(depth);
+        double random = Math.random();
+
         for (int i = 0; i < MINE_WIDTH; i++) {
-            if (depth % 2 == 0) {
-                ores[i] = Ores.STONE;
-            } else {
-                ores[i] = Ores.COAL;
+            for (Ores ore : Ores.values()) {
+                if (random < ore.getProbability(depth)/total) {
+                    ores[i] = ore;
+                    break;
+                }
+                random -= ore.getProbability(depth)/total;
             }
         }
         return ores;
     }
 
+    // generates the ores starting from the top do the bottom using the generateMineRow function
     private void generateMine() {
-        // TODO real ore generation
-        for(int i = 0; i < 7; i++) {
-            for(int j = 0; j < 9; j++) {
-                ores[i][j] = Ores.STONE;
+        int d = 1;
+        for (int y = MINE_HEIGHT-1; y >= 0; y--) {
+            Ores[] oresRow = generateMineRow(d);
+            d++;
+            for (int x = 0; x < MINE_WIDTH; x++) {
+                ores[x][y] = oresRow[x];
             }
         }
+        depth = d;
         save();
     }
 
@@ -209,27 +226,46 @@ public class Mine extends Building {
         }
     }
     public enum Ores {
-        AIR(0, 0),
-        STONE(1, 5),
-        COAL(2, 10),
-        IRON(3, 20),
-        GOLD(4, 30),
-        DIAMOND(4, 50),
-        EMERALD(5, 75),
+        AIR(0, 0, 0, 0, 0, 0, 0, 15),
+        STONE(1, 5, 0, 0, 75, 0.4d, 1.0d, 15),
+        COAL(2, 10, 0, 15, 50, 0.1d, 0.5d, 10),
+        IRON(3, 20, 5, 25, 100, 0.1d, 0.4d, 15),
+        GOLD(4, 30, 25, 50, 150, 0.01d, 0.2d, 20),
+        DIAMOND(4, 50, 30, 75, 500, 0.005d, 0.1d, 30),
+        EMERALD(5, 75, 40, 100, 500, 0.001d, 0.1d, 40),
         ;
 
         final int id;
         final int stars;
+        final int minDepth;
+        final int peakDepth;
+        final int maxDepth;
+        final double minValue;
+        final double maxValue;
+        final double width;
 
-        Ores(int id, int stars) {
+
+        Ores(int id, int stars, int minDepth, int peakDepth, int maxDepth, double minValue, double maxValue, double width) {
             this.id = id;
             this.stars = stars;
+            this.minDepth = minDepth;
+            this.peakDepth = peakDepth;
+            this.maxDepth = maxDepth;
+            this.minValue = minValue;
+            this.maxValue = maxValue;
+            this.width = width;
         }
 
         public static Ores getById(int id) {
             for (Ores ore : Ores.values())
                 if (ore.id == id) return ore;
             return null;
+        }
+
+        public double getProbability(int depth) {
+            if (depth < minDepth || depth > maxDepth) return minValue;
+            double gaussian = maxValue * Math.exp(-Math.pow(depth - (double) peakDepth, 2) / (2 * Math.pow(width, 2)));
+            return Math.max(gaussian, minValue);
         }
     }
 }
