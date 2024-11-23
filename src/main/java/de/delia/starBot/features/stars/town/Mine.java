@@ -16,14 +16,15 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class Mine extends Building {
     public Ores[][] ores;
     private ObjectMapper objectMapper;
-    int depth = 0;
-    int pickaxeCount = 0;
+    int depth;
+    int pickaxeCount;
     final int MINE_WIDTH = 7;
     final int MINE_HEIGHT = 9;
 
@@ -52,8 +53,8 @@ public class Mine extends Building {
         }
         try {
             JsonNode jsonNode = objectMapper.readTree(metaData);
-            depth = jsonNode.get("depth").asInt(0);
-            pickaxeCount = jsonNode.get("pickaxeCount").asInt(0);
+            this.depth = jsonNode.get("depth").asInt(0);
+            this.pickaxeCount = jsonNode.get("pickaxeCount").asInt(0);
 
             int[][] parsedArray = objectMapper.convertValue(jsonNode.get("ores"), int[][].class);
             for(int i = 0; i < MINE_WIDTH; i++) {
@@ -115,16 +116,12 @@ public class Mine extends Building {
     public String getDescription() {
         StringBuilder description = new StringBuilder();
 
-        // Simple mine visualization for testing purposes
+        description.append(":hole: Depth: ").append(depth).append("/").append(getLevel()*20).append("\n")
+                .append(":pick: Pickaxes: ").append(pickaxeCount).append("\n\n**Mine:**\n");
+        // Simple mine visualization with emoji
         for (int y = MINE_HEIGHT-1; y >= 0; y--) {
-            description.append(y).append(":");
             for (int x = 0; x < MINE_WIDTH; x++) {
-                description.append(" | ");
-                if (ores[x][y] == Ores.AIR) description.append(" ");
-                if (ores[x][y] == Ores.STONE) description.append("S");
-                if (ores[x][y] == Ores.COAL) description.append("C");
-                if (ores[x][y] == Ores.IRON) description.append("I");
-                if (ores[x][y] == Ores.GOLD) description.append("G");
+                description.append(ores[x][y].formatedEmoji);
             }
             description.append("\n");
         }
@@ -133,11 +130,28 @@ public class Mine extends Building {
 
     @Override
     public String getUpgradeText() {
-        return "Coming soon";
+        switch (getLevel()) {
+            case 0:
+                return """
+                        :pick: Daily pickaxes: **0 + 5 -> 5**
+                        :hole: Max depth: **0 + 20 -> 20**
+                        """;
+            case 1:
+                return """
+                        :pick: Daily pickaxes: **5 + 3 -> 8**
+                        :hole: Max depth: **20 + 20 -> 40**
+                        """;
+            case 2:
+                return """
+                        :pick: Daily pickaxes: **8 + 3 -> 12**
+                        :hole: Max depth: **40 + 20 -> 60**
+                        """;
+        }
+        return "coming soon!";
     }
 
     public Ores mineOre(int x, int y) throws MineException {
-        // if (getLevel() < 1) throw new MineException("You need at least level 1!");
+        if (getLevel() < 1) throw new MineException("You need at least level 1!");
         if (this.ores == null) generateMine();
         if (x < 0 || y < 0 || x >= MINE_WIDTH || y >= MINE_HEIGHT) {
             throw new MineException("Invalid coordinates!");
@@ -208,7 +222,7 @@ public class Mine extends Building {
 
     // generates the ores starting from the top do the bottom using the generateMineRow function
     private void generateMine() {
-        int d = 1;
+        int d = 0;
         for (int y = MINE_HEIGHT-1; y >= 0; y--) {
             Ores[] oresRow = generateMineRow(d);
             d++;
@@ -226,17 +240,18 @@ public class Mine extends Building {
         }
     }
     public enum Ores {
-        AIR(0, 0, 0, 0, 0, 0, 0, 15),
-        STONE(1, 5, 0, 0, 75, 0.4d, 1.0d, 15),
-        COAL(2, 10, 0, 15, 50, 0.1d, 0.5d, 10),
-        IRON(3, 20, 5, 25, 100, 0.1d, 0.4d, 15),
-        GOLD(4, 30, 25, 50, 150, 0.01d, 0.2d, 20),
-        DIAMOND(4, 50, 30, 75, 500, 0.005d, 0.1d, 30),
-        EMERALD(5, 75, 40, 100, 500, 0.001d, 0.1d, 40),
+        AIR(0, 0, "<:air:1060322785555140740>", 0, 0, 0, 0, 0, 15),
+        STONE(1, 5, "<:stone:1055867089602216018>", 0, 0, 75, 0.4d, 1.0d, 15),
+        COAL(2, 10, "<:coal:1055867114428313600>", 0, 15, 50, 0.1d, 0.5d, 10),
+        IRON(3, 20, "<:iron:1055867132384133210>", 5, 25, 100, 0.1d, 0.4d, 15),
+        GOLD(4, 30, "<:gold:1055867149379452978>", 25, 50, 150, 0.01d, 0.2d, 20),
+        DIAMOND(4, 50, "<:dia:1055867170128658526>", 30, 75, 500, 0.005d, 0.1d, 30),
+        EMERALD(5, 75, "<:dia:1055867170128658526>", 40, 100, 500, 0.001d, 0.1d, 40),
         ;
 
         final int id;
         final int stars;
+        final String formatedEmoji;
         final int minDepth;
         final int peakDepth;
         final int maxDepth;
@@ -245,9 +260,10 @@ public class Mine extends Building {
         final double width;
 
 
-        Ores(int id, int stars, int minDepth, int peakDepth, int maxDepth, double minValue, double maxValue, double width) {
+        Ores(int id, int stars, String formatedEmoji, int minDepth, int peakDepth, int maxDepth, double minValue, double maxValue, double width) {
             this.id = id;
             this.stars = stars;
+            this.formatedEmoji = formatedEmoji;
             this.minDepth = minDepth;
             this.peakDepth = peakDepth;
             this.maxDepth = maxDepth;
