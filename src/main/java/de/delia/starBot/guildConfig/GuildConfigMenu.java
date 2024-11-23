@@ -67,7 +67,7 @@ public class GuildConfigMenu extends EmbedMenu {
                         .setAuthor(e.getMember().getEffectiveName(), null, e.getMember().getUser().getAvatarUrl())
                         .setTitle("**Trading**")
                         .setColor(Color.CYAN)
-                        .addField((guildConfig.getConfig("enableStock", Boolean.class) ? ":green_circle:" : ":red_circle:") + " Enable Beta Stock Trading", "Enables the Experimental Trading System", true)
+                        .addField(((boolean) guildConfig.getConfig(Configs.ENABLE_STOCK) ? ":green_circle:" : ":red_circle:") + " Enable Beta Stock Trading", "Enables the Experimental Trading System", true)
                         .setFooter("Green = Enabled, Red = Disabled")
                         .setTimestamp(Instant.now());
 
@@ -101,8 +101,8 @@ public class GuildConfigMenu extends EmbedMenu {
                         .setAuthor(e.getMember().getEffectiveName(), null, e.getMember().getUser().getAvatarUrl())
                         .setTitle("**StarDrops**")
                         .setColor(Color.CYAN)
-                        .addField((guildConfig.getConfig("enableStarDrop", Boolean.class) ? ":green_circle:" : ":red_circle:") + " Enable StarDrops", "Enables Star Drops", false)
-                        .addField(":gear: Star Drop rarity:", guildConfig.getConfig("starDropMessageMin", Integer.class) + "-" + guildConfig.getConfig("starDropMessageMax", Integer.class) + " messages", false)
+                        .addField(((boolean) guildConfig.getConfig(Configs.ENABLE_STAR_DROP) ? ":green_circle:" : ":red_circle:") + " Enable StarDrops", "Enables Star Drops", false)
+                        .addField(":gear: Star Drop rarity:", (int) guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MIN) + "-" + (int) guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MAX) + " messages", false)
                         .addField(":gear: Blacklisted Channel", "Change this setting in the Dropdown below!", false)
                         .setFooter("Green = Enabled, Red = Disabled")
                         .setTimestamp(Instant.now());
@@ -182,7 +182,7 @@ public class GuildConfigMenu extends EmbedMenu {
         public void onMenuGenerate(OpenEmbedMenuEvent event) {
             GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
 
-            List<Long> channel = guildConfig.getConfigList("starDropBlacklistedChannel", Long.class);
+            List<Long> channel = (List<Long>) guildConfig.getConfigList(Configs.STAR_DROP_BLACKLISTED_CHANNEL);
 
             List<EntitySelectMenu.DefaultValue> defaultValues = channel.stream().map(EntitySelectMenu.DefaultValue::channel).toList();
 

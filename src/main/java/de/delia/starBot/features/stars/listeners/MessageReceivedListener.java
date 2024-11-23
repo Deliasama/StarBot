@@ -3,6 +3,7 @@ package de.delia.starBot.features.stars.listeners;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.features.stars.town.Building;
 import de.delia.starBot.features.stars.town.Telescope;
+import de.delia.starBot.guildConfig.Configs;
 import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -47,11 +48,11 @@ public class MessageReceivedListener extends ListenerAdapter {
         // StarDrops
         // check if starDrop is Enabled or if the channel is blacklisted
         GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
-        if (!guildConfig.getConfig("enableStarDrop", Boolean.class)) return;
-        if (guildConfig.getConfigList("starDropBlacklistedChannel", Long.class).contains(event.getChannel().getIdLong()))
+        if (!(boolean) guildConfig.getConfig(Configs.ENABLE_STAR_DROP)) return;
+        if (guildConfig.getConfigList(Configs.STAR_DROP_BLACKLISTED_CHANNEL).contains(event.getChannel().getIdLong()))
             return;
 
-        int index = this.index.getOrDefault(event.getGuild().getIdLong(), getRandomIndex(guildConfig.getConfig("starDropMessageMin", Integer.class), guildConfig.getConfig("starDropMessageMax", Integer.class)));
+        int index = this.index.getOrDefault(event.getGuild().getIdLong(), getRandomIndex((int) guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MIN), (int) guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MAX)));
         index--;
         if (index <= 0) {
 
@@ -72,7 +73,7 @@ public class MessageReceivedListener extends ListenerAdapter {
             }
             event.getChannel().sendMessageEmbeds(embedBuilder.build()).setActionRow(Main.INSTANCE.starDropMenu.getActionRow(ids)).queue();
 
-            index = getRandomIndex(guildConfig.getConfig("starDropMessageMin", Integer.class), guildConfig.getConfig("starDropMessageMax", Integer.class));
+            index = getRandomIndex((int) guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MIN), (int) guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MAX));
         }
         this.index.put(event.getGuild().getIdLong(), index);
     }
