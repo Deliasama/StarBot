@@ -55,6 +55,7 @@ public class GuildConfig {
         }
     }
 
+    @Deprecated
     public <T> List<T> getConfigList(String key, Class<T> type) {
         if (!configs.containsKey(key)) return null;
         try {
@@ -84,6 +85,7 @@ public class GuildConfig {
         }
     }
 
+    @Deprecated
     public void setConfigList(Configs config, List<?> value) {
         try {
             configs.put(config.id, objectMapper.writeValueAsString(value));
@@ -92,6 +94,7 @@ public class GuildConfig {
         }
     }
 
+    @Deprecated
     public <T> T getConfig(String key, Class<T> type) {
         if (!configs.containsKey(key)) return null;
         return objectMapper.convertValue(configs.get(key), type);
@@ -102,6 +105,11 @@ public class GuildConfig {
             return config.defaultValue;
         }
         return objectMapper.convertValue(configs.get(config.id), config.type);
+    }
+
+    public boolean getConfigAsBoolean(Configs config) {
+        if (config.type != boolean.class && config.type != Boolean.class) return false;
+        return (boolean) getConfig(config);
     }
 
     public void setConfig(String key, String value) {

@@ -77,14 +77,14 @@ public class GuildConfigMenu extends EmbedMenu {
                 // load Guild Config
                 GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
 
-                guildConfig.setConfig("enableStock", String.valueOf(!guildConfig.getConfig("enableStock", Boolean.class)));
+                guildConfig.setConfig(Configs.ENABLE_STOCK, String.valueOf(!guildConfig.getConfigAsBoolean(Configs.ENABLE_STOCK)));
                 guildConfig.update();
 
                 event.editMessageEmbeds(menu.getEmbed(event.getMember(), event.getGuild(), event.getChannel()).get().build()).queue();
 
                 // Logging
                 Main.INSTANCE.discordLogging.log(event.getGuild().getIdLong(), DiscordLogging.LoggingType.WARN, "Config changed",
-                        event.getMember().getAsMention() + (guildConfig.getConfig("enableStock", Boolean.class) ? " enabled" : " disabled") + " Beta Stock Trading!");
+                        event.getMember().getAsMention() + (guildConfig.getConfigAsBoolean(Configs.ENABLE_STOCK) ? " enabled" : " disabled") + " Beta Stock Trading!");
             });
             addBackButton();
         }
@@ -113,7 +113,7 @@ public class GuildConfigMenu extends EmbedMenu {
                 // load Guild Config
                 GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
 
-                guildConfig.setConfig("enableStarDrop", String.valueOf(!guildConfig.getConfig("enableStarDrop", Boolean.class)));
+                guildConfig.setConfig(Configs.ENABLE_STAR_DROP, String.valueOf(!guildConfig.getConfigAsBoolean(Configs.ENABLE_STAR_DROP)));
 
                 guildConfig.update();
 
@@ -121,7 +121,7 @@ public class GuildConfigMenu extends EmbedMenu {
 
                 // Logging
                 Main.INSTANCE.discordLogging.log(event.getGuild().getIdLong(), DiscordLogging.LoggingType.WARN, "Config changed",
-                        event.getMember().getAsMention() + (guildConfig.getConfig("enableStock", Boolean.class) ? " enabled" : " disabled") + " StarDrops!");
+                        event.getMember().getAsMention() + (guildConfig.getConfigAsBoolean(Configs.ENABLE_STOCK) ? " enabled" : " disabled") + " StarDrops!");
             });
             addEntitySelectMenu(
                     EntitySelectMenu.create("settingStarDropBC", EntitySelectMenu.SelectTarget.CHANNEL)
@@ -215,7 +215,7 @@ public class GuildConfigMenu extends EmbedMenu {
                 // load Guild Config
                 GuildConfig guildConfig = GuildConfig.getGuildConfig(event.getGuild().getIdLong());
 
-                guildConfig.setConfig(Configs.ENABLE_LOG, String.valueOf(!((boolean) guildConfig.getConfig(Configs.ENABLE_LOG))));
+                guildConfig.setConfig(Configs.ENABLE_LOG, String.valueOf(!guildConfig.getConfigAsBoolean(Configs.ENABLE_LOG)));
 
                 guildConfig.update();
 

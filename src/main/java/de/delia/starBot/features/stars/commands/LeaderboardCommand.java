@@ -4,6 +4,7 @@ import de.delia.starBot.commands.ApplicationCommand;
 import de.delia.starBot.commands.ApplicationCommandMethod;
 import de.delia.starBot.commands.Option;
 import de.delia.starBot.features.stars.tables.StarProfile;
+import de.delia.starBot.guildConfig.Configs;
 import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.main.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -34,7 +35,7 @@ public class LeaderboardCommand {
             stringBuilder
                     .append("**#").append(i).append("** ").append(UserSnowflake.fromId(starProfiles.get(i - 1).getMemberId()).getAsMention()).append("\n")
                     .append(" - ").append(starProfiles.get(i - 1).getStars()).append("⭐");
-            if (config.getConfig("enableStock", Boolean.class)) {
+            if (config.getConfigAsBoolean(Configs.ENABLE_STOCK)) {
                 stringBuilder.append(" - ").append(starProfiles.get(i - 1).getShares()).append(":scroll:");
             }
             stringBuilder.append("\n");
