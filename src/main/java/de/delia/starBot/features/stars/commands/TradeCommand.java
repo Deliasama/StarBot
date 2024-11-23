@@ -3,6 +3,7 @@ package de.delia.starBot.features.stars.commands;
 import de.delia.starBot.commands.ApplicationCommand;
 import de.delia.starBot.commands.ApplicationCommandMethod;
 import de.delia.starBot.features.stars.TradeManager;
+import de.delia.starBot.guildConfig.Configs;
 import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.main.Bot;
 import de.delia.starBot.main.Main;
@@ -19,7 +20,7 @@ import java.io.IOException;
 public class TradeCommand {
     @ApplicationCommandMethod
     public void onCommand(Bot bot, SlashCommandInteractionEvent event) {
-        if (!GuildConfig.getGuildConfig(event.getGuild().getIdLong()).getConfig("enableStock", Boolean.class)) {
+        if (!GuildConfig.getGuildConfig(event.getGuild().getIdLong()).getConfigAsBoolean(Configs.ENABLE_STOCK)) {
             event.reply("The Stock System is disabled on this server!").setEphemeral(true).queue();
             return;
         }
