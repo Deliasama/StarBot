@@ -18,21 +18,19 @@ import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 public class Mine extends Building {
-    public Ores[][] ores;
-    private ObjectMapper objectMapper;
-    int depth;
-    final int MINE_WIDTH = 7;
-    final int MINE_HEIGHT = 9;
-
     private static final Modal mineModal = Modal.create("embedMenu:town:buildings:Mine:mineModal", "Mine")
             .addActionRow(TextInput.create("x-coordinate", "x-coordinate", TextInputStyle.SHORT).setMaxLength(1).setPlaceholder("3").build())
             .addActionRow(TextInput.create("y-coordinate", "y-coordinate", TextInputStyle.SHORT).setMaxLength(1).setPlaceholder("6").build())
             .build();
+    final int MINE_WIDTH = 7;
+    final int MINE_HEIGHT = 9;
+    public Ores[][] ores;
+    int depth;
+    private ObjectMapper objectMapper;
 
 
     public Mine(BuildingEntity entity) {
@@ -57,8 +55,8 @@ public class Mine extends Building {
             this.depth = jsonNode.get("depth").asInt(0);
 
             int[][] parsedArray = objectMapper.convertValue(jsonNode.get("ores"), int[][].class);
-            for(int i = 0; i < MINE_WIDTH; i++) {
-                for(int j = 0; j < MINE_HEIGHT; j++) {
+            for (int i = 0; i < MINE_WIDTH; i++) {
+                for (int j = 0; j < MINE_HEIGHT; j++) {
                     ores[i][j] = Ores.getById(parsedArray[i][j]);
                     if (ores[i][j] == null) ores[i][j] = Ores.STONE;
                 }
@@ -72,9 +70,9 @@ public class Mine extends Building {
     public String writeMetaData() {
         if (objectMapper == null) this.objectMapper = new ObjectMapper();
         int[][] oreArray = new int[MINE_WIDTH][MINE_HEIGHT];
-        for(int i = 0; i < MINE_WIDTH; i++) {
-            for(int j = 0; j < MINE_HEIGHT; j++) {
-                if(ores[i][j] == null) continue;
+        for (int i = 0; i < MINE_WIDTH; i++) {
+            for (int j = 0; j < MINE_HEIGHT; j++) {
+                if (ores[i][j] == null) continue;
                 oreArray[i][j] = ores[i][j].id;
             }
         }
@@ -97,7 +95,7 @@ public class Mine extends Building {
             if (getLevel() == 0) {
                 buttonInteractionEvent.reply("You need at least level 1!").setEphemeral(true).queue();
             }
-            if (depth >= 20*getLevel()){
+            if (depth >= 20 * getLevel()) {
                 generateMine();
                 buttonInteractionEvent.editMessageEmbeds(getEmbed()).queue();
             } else {
@@ -127,10 +125,10 @@ public class Mine extends Building {
         StarProfile starProfile = StarProfile.getTable().get(getGuildId(), getMemberId());
         StringBuilder description = new StringBuilder();
 
-        description.append(":hole: Depth: ").append(depth).append("/").append(getLevel()*20).append("\n")
+        description.append(":hole: Depth: ").append(depth).append("/").append(getLevel() * 20).append("\n")
                 .append(":pick: Pickaxes: ").append(starProfile.getPickaxeCount()).append("\n\n**Mine:**\n");
         // Simple mine visualization with emoji
-        for (int y = MINE_HEIGHT-1; y >= 0; y--) {
+        for (int y = MINE_HEIGHT - 1; y >= 0; y--) {
             for (int x = 0; x < MINE_WIDTH; x++) {
                 description.append(ores[x][y].formatedEmoji);
             }
@@ -172,12 +170,12 @@ public class Mine extends Building {
             throw new MineException("You don't have a pickaxe!");
         }
         // checks if the mined ore is on the surface or else check if air is next by
-        if (y != (MINE_HEIGHT-1)) {
+        if (y != (MINE_HEIGHT - 1)) {
             List<Ores> neighbours = new ArrayList<>();
-            if (y-1 >= 0) neighbours.add(ores[x][y-1]);
-            neighbours.add(ores[x][y+1]);
-            if (x-1 >= 0) neighbours.add(ores[x-1][y]);
-            if (x+1 < MINE_WIDTH) neighbours.add(ores[x+1][y]);
+            if (y - 1 >= 0) neighbours.add(ores[x][y - 1]);
+            neighbours.add(ores[x][y + 1]);
+            if (x - 1 >= 0) neighbours.add(ores[x - 1][y]);
+            if (x + 1 < MINE_WIDTH) neighbours.add(ores[x + 1][y]);
             if (!neighbours.contains(Ores.AIR)) throw new MineException("Unreachable Ore!");
         }
         if (this.ores[x][y] != null && this.ores[x][y] != Ores.AIR) {
@@ -186,7 +184,7 @@ public class Mine extends Building {
 
             // shift the mine one up and add 1 to the depth if the 2. lowest ore is mined
             if (y <= 1) {
-                if (depth+1 > getLevel()*20) {
+                if (depth + 1 > getLevel() * 20) {
                     throw new MineException("Maximal depth reached!");
                 }
                 depth++;
@@ -203,13 +201,13 @@ public class Mine extends Building {
     }
 
     private void shiftMineUp(Ores[] newRow) {
-        for (int y = MINE_HEIGHT-1; y >= 0; y--) {
+        for (int y = MINE_HEIGHT - 1; y >= 0; y--) {
             for (int x = 0; x < MINE_WIDTH; x++) {
                 if (y == 0) {
                     ores[x][y] = newRow[x];
                     continue;
                 }
-                ores[x][y] = ores[x][y-1];
+                ores[x][y] = ores[x][y - 1];
             }
         }
     }
@@ -223,11 +221,11 @@ public class Mine extends Building {
         for (int i = 0; i < MINE_WIDTH; i++) {
             double random = Math.random();
             for (Ores ore : Ores.values()) {
-                if (random < ore.getProbability(depth)/total) {
+                if (random < ore.getProbability(depth) / total) {
                     ores[i] = ore;
                     break;
                 }
-                random -= ore.getProbability(depth)/total;
+                random -= ore.getProbability(depth) / total;
             }
         }
         return ores;
@@ -236,7 +234,7 @@ public class Mine extends Building {
     // generates the ores starting from the top do the bottom using the generateMineRow function
     private void generateMine() {
         int d = 0;
-        for (int y = MINE_HEIGHT-1; y >= 0; y--) {
+        for (int y = MINE_HEIGHT - 1; y >= 0; y--) {
             Ores[] oresRow = generateMineRow(d);
             d++;
             for (int x = 0; x < MINE_WIDTH; x++) {
@@ -247,11 +245,6 @@ public class Mine extends Building {
         save();
     }
 
-    public static class MineException extends Exception {
-        public MineException(String message) {
-            super(message);
-        }
-    }
     public enum Ores {
         AIR(0, 0, "<:air:1060322785555140740>", 0, 0, 0, 0, 0, 15),
         STONE(1, 5, "<:stone:1055867089602216018>", 0, 0, 75, 0.4d, 1.0d, 15),
@@ -295,6 +288,12 @@ public class Mine extends Building {
             if (depth < minDepth || depth > maxDepth) return minValue;
             double gaussian = maxValue * Math.exp(-Math.pow(depth - (double) peakDepth, 2) / (2 * Math.pow(width, 2)));
             return Math.max(gaussian, minValue);
+        }
+    }
+
+    public static class MineException extends Exception {
+        public MineException(String message) {
+            super(message);
         }
     }
 }
