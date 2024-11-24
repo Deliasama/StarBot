@@ -1,6 +1,7 @@
 package de.delia.starBot.features.stars.town;
 
 import de.delia.starBot.features.stars.tables.BuildingEntity;
+import de.delia.starBot.menus.EmbedMenu;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
@@ -36,7 +37,7 @@ public class TownHall extends Building {
     }
 
     @Override
-    public void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id) {
+    public void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id, EmbedMenu menu) {
 
     }
 

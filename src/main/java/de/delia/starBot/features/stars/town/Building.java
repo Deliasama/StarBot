@@ -4,20 +4,20 @@ import de.delia.starBot.features.stars.tables.BuildingEntity;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.main.DiscordLogging;
 import de.delia.starBot.main.Main;
+import de.delia.starBot.menus.EmbedMenu;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -139,11 +139,14 @@ public abstract class Building implements Comparable<Building> {
         return null;
     }
 
+    public void onModalInteraction(ModalInteractionEvent event, String id, EmbedMenu menu) {
+    }
+
     public abstract void readMetaData(String metaData);
 
     public abstract String writeMetaData();
 
-    public abstract void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id);
+    public abstract void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id, EmbedMenu menu);
 
     public abstract String getDescription();
 

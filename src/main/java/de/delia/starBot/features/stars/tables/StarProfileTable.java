@@ -18,7 +18,7 @@ public class StarProfileTable extends Table<StarProfile> {
                     .setParameter(2, memberId)
                     .getResultList();
             if (starProfiles.isEmpty()) {
-                StarProfile starProfile = new StarProfile(guildId, memberId, 0, 0);
+                StarProfile starProfile = new StarProfile(guildId, memberId, 0, 0, 0);
                 save(starProfile);
                 return starProfile;
             }
@@ -59,6 +59,7 @@ public class StarProfileTable extends Table<StarProfile> {
 
             u.setStars(starProfile.getStars());
             u.setShares(starProfile.getShares());
+            u.setPickaxeCount(starProfile.getPickaxeCount());
 
             m.persist(u);
             m.getTransaction().commit();
