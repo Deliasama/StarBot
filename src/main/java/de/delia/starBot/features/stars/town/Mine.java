@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.delia.starBot.features.stars.tables.BuildingEntity;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.menus.EmbedMenu;
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -86,11 +87,23 @@ public class Mine extends Building {
 
     @Override
     public ActionRow getActionRow() {
-        return ActionRow.of(Button.secondary("embedMenu:town:buildings:Mine:mine", Emoji.fromUnicode("⛏️")));
+        return ActionRow.of(Button.secondary("embedMenu:town:buildings:Mine:mine", Emoji.fromUnicode("⛏️")),
+                Button.secondary("embedMenu:town:buildings:Mine:reset", Emoji.fromUnicode("\uD83D\uDD04")));
     }
 
     public void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id, EmbedMenu menu) {
         if (id.equals("mine")) buttonInteractionEvent.replyModal(mineModal).queue();
+        if (id.equals("reset")) {
+            if (getLevel() == 0) {
+                buttonInteractionEvent.reply("You need at least level 1!").setEphemeral(true).queue();
+            }
+            if (depth >= 20*getLevel()){
+                generateMine();
+                buttonInteractionEvent.editMessageEmbeds(getEmbed()).queue();
+            } else {
+                buttonInteractionEvent.reply("You need to reach the max depth for that!").setEphemeral(true).queue();
+            }
+        }
     }
 
     public void onModalInteraction(ModalInteractionEvent event, String id, EmbedMenu menu) {
@@ -100,7 +113,9 @@ public class Mine extends Building {
 
             try {
                 Ores minedOre = mineOre(x, y);
-                event.editMessageEmbeds(this.getEmbed()).queue();
+                EmbedBuilder builder = EmbedBuilder.fromData(getEmbed().toData());
+                builder.setDescription("You mined **" + minedOre.name() + "** and received **" + minedOre.stars + "** Stars!\n\n" + getEmbed().getDescription());
+                event.editMessageEmbeds(builder.build()).queue();
             } catch (MineException e) {
                 event.reply(e.getMessage()).setEphemeral(true).queue();
             }
@@ -139,7 +154,7 @@ public class Mine extends Building {
                         """;
             case 2:
                 return """
-                        :pick: Daily pickaxes: **8 + 3 -> 12**
+                        :pick: Daily pickaxes: **8 + 3 -> 11**
                         :hole: Max depth: **40 + 20 -> 60**
                         """;
         }
@@ -178,6 +193,7 @@ public class Mine extends Building {
                 shiftMineUp(generateMineRow(depth));
             }
             starProfile.setPickaxeCount(starProfile.getPickaxeCount() - 1);
+            starProfile.setStars(starProfile.getStars() + ore.stars);
             StarProfile.getTable().update(starProfile);
             save();
 
