@@ -5,6 +5,7 @@ import de.delia.starBot.commands.ApplicationCommandMethod;
 import de.delia.starBot.features.stars.tables.Daily;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.features.stars.town.Building;
+import de.delia.starBot.features.stars.town.Mine;
 import de.delia.starBot.features.stars.town.TownHall;
 import de.delia.starBot.main.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -42,6 +43,12 @@ public class DailyCommand {
             int dividendBonus = (int) (((float) dividendVolume) * share);
             */
 
+            // Pickaxes
+            Mine mine = (Mine) Building.loadBuilding(Mine.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
+            int pickaxeCount = 0;
+            if (mine != null && mine.getLevel() != 0) pickaxeCount = 2 + mine.getLevel()*3;
+
+            // Stars
             TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
             if (townHall == null)
                 townHall = (TownHall) Building.create(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
@@ -50,16 +57,22 @@ public class DailyCommand {
                 townHall.save();
             }
             int starsEarned = (10 * townHall.getLevel()) + ((daily.getStreak() - 1) * townHall.getLevel()); //+ dividendBonus;
-
-            starProfile.addStars(starsEarned);
+            starProfile.setStars(starProfile.getStars() + starsEarned);
+            starProfile.setPickaxeCount(starProfile.getPickaxeCount() + pickaxeCount);
+            StarProfile.getTable().update(starProfile);
             Daily.getTable().update(daily);
+
+            StringBuilder description = new StringBuilder();
+            description.append("You earned **").append(starsEarned).append("** Stars!\n").append("Streak: **").append(daily.getStreak() - 1).append("** :fire:");
+            if (pickaxeCount != 0) description.append("\nPickaxes received: **").append(pickaxeCount).append("** :pick:");
+
 
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setAuthor(event.getMember().getEffectiveName(), event.getUser().getAvatarUrl(), event.getUser().getAvatarUrl())
                     .setColor(Color.cyan)
                     .setTitle("Daily")
                     .setTimestamp(Instant.now())
-                    .setDescription("You earned **" + starsEarned + "** Stars!\nStreak: **" + (daily.getStreak() - 1) + "** :fire:");
+                    .setDescription(description.toString());
 
             event.replyEmbeds(embedBuilder.build()).queue();
         } else {

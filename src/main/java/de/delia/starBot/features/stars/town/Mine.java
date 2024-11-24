@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.delia.starBot.features.stars.tables.BuildingEntity;
+import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.menus.EmbedMenu;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
@@ -24,7 +25,6 @@ public class Mine extends Building {
     public Ores[][] ores;
     private ObjectMapper objectMapper;
     int depth;
-    int pickaxeCount;
     final int MINE_WIDTH = 7;
     final int MINE_HEIGHT = 9;
 
@@ -54,7 +54,6 @@ public class Mine extends Building {
         try {
             JsonNode jsonNode = objectMapper.readTree(metaData);
             this.depth = jsonNode.get("depth").asInt(0);
-            this.pickaxeCount = jsonNode.get("pickaxeCount").asInt(0);
 
             int[][] parsedArray = objectMapper.convertValue(jsonNode.get("ores"), int[][].class);
             for(int i = 0; i < MINE_WIDTH; i++) {
@@ -81,7 +80,6 @@ public class Mine extends Building {
         ObjectNode node = objectMapper.createObjectNode();
         node.set("ores", objectMapper.valueToTree(oreArray));
         node.put("depth", depth);
-        node.put("pickaxeCount", pickaxeCount);
 
         return node.toString();
     }
@@ -92,10 +90,7 @@ public class Mine extends Building {
     }
 
     public void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id, EmbedMenu menu) {
-        if (id.equals("mine")) {
-            pickaxeCount++;
-            buttonInteractionEvent.replyModal(mineModal).queue();
-        }
+        if (id.equals("mine")) buttonInteractionEvent.replyModal(mineModal).queue();
     }
 
     public void onModalInteraction(ModalInteractionEvent event, String id, EmbedMenu menu) {
@@ -107,17 +102,18 @@ public class Mine extends Building {
                 Ores minedOre = mineOre(x, y);
                 event.editMessageEmbeds(this.getEmbed()).queue();
             } catch (MineException e) {
-                event.reply(e.getMessage()).queue();
+                event.reply(e.getMessage()).setEphemeral(true).queue();
             }
         }
     }
 
     @Override
     public String getDescription() {
+        StarProfile starProfile = StarProfile.getTable().get(getGuildId(), getMemberId());
         StringBuilder description = new StringBuilder();
 
         description.append(":hole: Depth: ").append(depth).append("/").append(getLevel()*20).append("\n")
-                .append(":pick: Pickaxes: ").append(pickaxeCount).append("\n\n**Mine:**\n");
+                .append(":pick: Pickaxes: ").append(starProfile.getPickaxeCount()).append("\n\n**Mine:**\n");
         // Simple mine visualization with emoji
         for (int y = MINE_HEIGHT-1; y >= 0; y--) {
             for (int x = 0; x < MINE_WIDTH; x++) {
@@ -156,7 +152,8 @@ public class Mine extends Building {
         if (x < 0 || y < 0 || x >= MINE_WIDTH || y >= MINE_HEIGHT) {
             throw new MineException("Invalid coordinates!");
         }
-        if (this.pickaxeCount <= 0) {
+        StarProfile starProfile = StarProfile.getTable().get(getGuildId(), getMemberId());
+        if (starProfile.getPickaxeCount() <= 0) {
             throw new MineException("You don't have a pickaxe!");
         }
         // checks if the mined ore is on the surface or else check if air is next by
@@ -171,17 +168,17 @@ public class Mine extends Building {
         if (this.ores[x][y] != null && this.ores[x][y] != Ores.AIR) {
             Ores ore = ores[x][y];
             ores[x][y] = Ores.AIR;
-            pickaxeCount--;
 
             // shift the mine one up and add 1 to the depth if the 2. lowest ore is mined
             if (y <= 1) {
                 if (depth+1 > getLevel()*20) {
-                    pickaxeCount++;
                     throw new MineException("Maximal depth reached!");
                 }
                 depth++;
                 shiftMineUp(generateMineRow(depth));
             }
+            starProfile.setPickaxeCount(starProfile.getPickaxeCount() - 1);
+            StarProfile.getTable().update(starProfile);
             save();
 
             return ore;
@@ -206,9 +203,9 @@ public class Mine extends Building {
         Ores[] ores = new Ores[MINE_WIDTH];
         double total = 0.0d;
         for (Ores ore : Ores.values()) total += ore.getProbability(depth);
-        double random = Math.random();
 
         for (int i = 0; i < MINE_WIDTH; i++) {
+            double random = Math.random();
             for (Ores ore : Ores.values()) {
                 if (random < ore.getProbability(depth)/total) {
                     ores[i] = ore;

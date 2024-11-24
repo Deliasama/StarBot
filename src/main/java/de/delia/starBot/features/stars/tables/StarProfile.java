@@ -26,11 +26,16 @@ public class StarProfile {
     @Column
     private float shares;
 
-    public StarProfile(long guildId, long memberId, int stars, int shares) {
+    @Column(nullable = false)
+    private int pickaxeCount = 0;
+
+    public StarProfile(long guildId, long memberId, int stars, int shares, Integer pickaxeCount) {
         this.guildId = guildId;
         this.memberId = memberId;
         this.stars = stars;
         this.shares = shares;
+        if (pickaxeCount != null) this.pickaxeCount = pickaxeCount;
+        if (pickaxeCount == null) this.pickaxeCount = 0;
     }
 
     public static StarProfileTable getTable() {
