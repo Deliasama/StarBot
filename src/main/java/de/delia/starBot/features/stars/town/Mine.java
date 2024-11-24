@@ -94,6 +94,7 @@ public class Mine extends Building {
         if (id.equals("reset")) {
             if (getLevel() == 0) {
                 buttonInteractionEvent.reply("You need at least level 1!").setEphemeral(true).queue();
+return;
             }
             if (depth >= 20 * getLevel()) {
                 generateMine();
