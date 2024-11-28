@@ -94,7 +94,7 @@ public class Mine extends Building {
         if (id.equals("reset")) {
             if (getLevel() == 0) {
                 buttonInteractionEvent.reply("You need at least level 1!").setEphemeral(true).queue();
-return;
+                return;
             }
             if (depth >= 20 * getLevel()) {
                 generateMine();
@@ -127,7 +127,7 @@ return;
         StringBuilder description = new StringBuilder();
 
         description.append(":hole: Depth: ").append(depth).append("/").append(getLevel() * 20).append("\n")
-                .append(":pick: Pickaxes: ").append(starProfile.getPickaxeCount()).append("\n\n**Mine:**\n");
+                .append(":pick: Pickaxes: ").append(starProfile.getPickaxeCount()).append("/").append(getLevel() * 5 + 5).append("\n\n**Mine:**\n");
         // Simple mine visualization with emoji
         for (int y = MINE_HEIGHT - 1; y >= 0; y--) {
             for (int x = 0; x < MINE_WIDTH; x++) {
@@ -145,16 +145,19 @@ return;
                 return """
                         :pick: Daily pickaxes: **0 + 5 -> 5**
                         :hole: Max depth: **0 + 20 -> 20**
+                        :pick: Max pickaxes: **5 + 5 -> 10**
                         """;
             case 1:
                 return """
                         :pick: Daily pickaxes: **5 + 3 -> 8**
                         :hole: Max depth: **20 + 20 -> 40**
+                        :pick: Max pickaxes: **10 + 5 -> 15**
                         """;
             case 2:
                 return """
                         :pick: Daily pickaxes: **8 + 3 -> 11**
                         :hole: Max depth: **40 + 20 -> 60**
+                        :pick: Max pickaxes: **15 + 5 -> 20**
                         """;
         }
         return "coming soon!";

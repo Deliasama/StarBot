@@ -46,7 +46,10 @@ public class DailyCommand {
             // Pickaxes
             Mine mine = (Mine) Building.loadBuilding(Mine.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
             int pickaxeCount = 0;
-            if (mine != null && mine.getLevel() != 0) pickaxeCount = 2 + mine.getLevel()*3;
+            if (mine != null && mine.getLevel() > 0) pickaxeCount = 2 + mine.getLevel()*3;
+            int maxPickaxeCount = 5;
+            if (mine != null && mine.getLevel() > 0) maxPickaxeCount = 5 + mine.getLevel();
+            if ((starProfile.getPickaxeCount() + pickaxeCount) > maxPickaxeCount) pickaxeCount = maxPickaxeCount - starProfile.getPickaxeCount();
 
             // Stars
             TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
