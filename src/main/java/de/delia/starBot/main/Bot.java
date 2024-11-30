@@ -6,6 +6,7 @@ import de.delia.starBot.features.basics.StatusCommand;
 import de.delia.starBot.features.birthday.BirthdayCommand;
 import de.delia.starBot.features.birthday.BirthdayManager;
 import de.delia.starBot.features.birthday.BirthdayTable;
+import de.delia.starBot.features.stars.StarProfileManager;
 import de.delia.starBot.features.stars.TradeManager;
 import de.delia.starBot.features.stars.commands.*;
 import de.delia.starBot.features.stars.listeners.ButtonInteractionListener;
@@ -49,6 +50,7 @@ public class Bot {
 
     // Managers
     public BirthdayManager birthdayManager;
+    public StarProfileManager starProfileManager;
     public Map<Long, TradeManager> tradeManagers = new HashMap<>();
 
     // Menus
@@ -93,6 +95,8 @@ public class Bot {
         commandManager.registerCommand(TradeCommand.class);
         commandManager.registerCommand(TownCommand.class);
         commandManager.registerCommand(Visit.class);
+
+        starProfileManager = new StarProfileManager();
 
         commandManager.registerCommand(BirthdayCommand.class);
 

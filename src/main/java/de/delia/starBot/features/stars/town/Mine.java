@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import de.delia.starBot.features.stars.tables.BuildingEntity;
 import de.delia.starBot.features.stars.tables.StarProfile;
+import de.delia.starBot.main.Main;
 import de.delia.starBot.menus.EmbedMenu;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -123,18 +124,21 @@ public class Mine extends Building {
 
     @Override
     public String getDescription() {
-        StarProfile starProfile = StarProfile.getTable().get(getGuildId(), getMemberId());
+        StarProfile starProfile = Main.INSTANCE.starProfileManager.getProfile(getGuildId(), getMemberId());
         StringBuilder description = new StringBuilder();
 
         description.append(":hole: Depth: ").append(depth).append("/").append(getLevel() * 20).append("\n")
-                .append(":pick: Pickaxes: ").append(starProfile.getPickaxeCount()).append("/").append(getLevel() * 5 + 5).append("\n\n**Mine:**\n");
+                .append(":pick: Pickaxes: ").append(starProfile.getPickaxeCount()).append("/").append(getLevel() * 6 + 5).append("\n\n**Mine:**\n");
         // Simple mine visualization with emoji
         for (int y = MINE_HEIGHT - 1; y >= 0; y--) {
+            description.append(":number_" + (y+1) + ":");
             for (int x = 0; x < MINE_WIDTH; x++) {
                 description.append(ores[x][y].formatedEmoji);
             }
             description.append("\n");
         }
+        description.append(":blue_square:");
+        for (int i = 1; i <= MINE_WIDTH; i++) description.append(":number_" + i + ":");
         return description.toString();
     }
 
@@ -169,7 +173,7 @@ public class Mine extends Building {
         if (x < 0 || y < 0 || x >= MINE_WIDTH || y >= MINE_HEIGHT) {
             throw new MineException("Invalid coordinates!");
         }
-        StarProfile starProfile = StarProfile.getTable().get(getGuildId(), getMemberId());
+        StarProfile starProfile = Main.INSTANCE.starProfileManager.getProfile(getGuildId(), getMemberId());
         if (starProfile.getPickaxeCount() <= 0) {
             throw new MineException("You don't have a pickaxe!");
         }
@@ -196,7 +200,7 @@ public class Mine extends Building {
             }
             starProfile.setPickaxeCount(starProfile.getPickaxeCount() - 1);
             starProfile.setStars(starProfile.getStars() + ore.stars);
-            StarProfile.getTable().update(starProfile);
+            Main.INSTANCE.starProfileManager.updateProfile(starProfile);
             save();
 
             return ore;

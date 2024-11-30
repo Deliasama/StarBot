@@ -9,6 +9,7 @@ import de.delia.starBot.features.stars.town.Mine;
 import de.delia.starBot.features.stars.town.TownHall;
 import de.delia.starBot.main.Bot;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
@@ -19,8 +20,9 @@ import java.time.*;
 public class DailyCommand {
     @ApplicationCommandMethod
     public void onCommand(Bot bot, SlashCommandInteractionEvent event) {
-        Daily daily = Daily.getTable().get(event.getGuild().getIdLong(), event.getUser().getIdLong());
-        StarProfile starProfile = StarProfile.getTable().get(event.getGuild().getIdLong(), event.getUser().getIdLong());
+        if (event.getChannel() instanceof PrivateChannel) return;
+        Daily daily = Daily.getTable().get(event.getGuild().getIdLong(), event.getMember().getIdLong());
+        StarProfile starProfile = bot.starProfileManager.getProfile(event.getGuild().getIdLong(), event.getUser().getIdLong());
 
         ZonedDateTime now = Instant.now().atZone(ZoneOffset.systemDefault());
         ZonedDateTime lastCalled = daily.getLastCalled() == null ? now.minusDays(1) : daily.getLastCalled().atZone(ZoneOffset.systemDefault());
@@ -48,7 +50,7 @@ public class DailyCommand {
             int pickaxeCount = 0;
             if (mine != null && mine.getLevel() > 0) pickaxeCount = 2 + mine.getLevel()*3;
             int maxPickaxeCount = 5;
-            if (mine != null && mine.getLevel() > 0) maxPickaxeCount = 5 + mine.getLevel();
+            if (mine != null && mine.getLevel() > 0) maxPickaxeCount += 6 * mine.getLevel();
             if ((starProfile.getPickaxeCount() + pickaxeCount) > maxPickaxeCount) pickaxeCount = maxPickaxeCount - starProfile.getPickaxeCount();
 
             // Stars
@@ -62,7 +64,7 @@ public class DailyCommand {
             int starsEarned = (10 * townHall.getLevel()) + ((daily.getStreak() - 1) * townHall.getLevel()); //+ dividendBonus;
             starProfile.setStars(starProfile.getStars() + starsEarned);
             starProfile.setPickaxeCount(starProfile.getPickaxeCount() + pickaxeCount);
-            StarProfile.getTable().update(starProfile);
+            bot.starProfileManager.updateProfile(starProfile);
             Daily.getTable().update(daily);
 
             StringBuilder description = new StringBuilder();

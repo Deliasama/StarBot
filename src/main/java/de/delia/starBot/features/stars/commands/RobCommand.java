@@ -21,13 +21,16 @@ import java.util.Random;
 
 @ApplicationCommand(name = "rob", description = "Rob other Users!")
 public class RobCommand {
-if (event.getMember().getIdLong() == other.getIdLong()) return;
     static Map<String, Instant> cooldowns = new HashMap<>();
     Random random = new Random();
     Duration cooldownDuration = Duration.ofHours(6);
 
     @ApplicationCommandMethod
     public void onCommand(Bot bot, SlashCommandInteractionEvent event, @Option(description = "Member to rob") User other) {
+        if (event.getMember().getIdLong() == other.getIdLong()) {
+            event.reply("You can't rob yourself!").setEphemeral(true).queue();
+            return;
+        }
         if (cooldowns.containsKey(event.getMember().getId())) {
             if (!Instant.now().isAfter(cooldowns.get(event.getMember().getId()).plus(cooldownDuration))) {
                 event.reply("You have to wait until " + TimeFormat.RELATIVE.atInstant(cooldowns.get(event.getMember().getId()).plus(cooldownDuration)) + " to rob again!").setEphemeral(true).queue();
@@ -36,9 +39,9 @@ if (event.getMember().getIdLong() == other.getIdLong()) return;
         }
         cooldowns.put(event.getMember().getId(), Instant.now());
 
-        StarProfile profile = bot.starProfileTable.get(event.getGuild().getIdLong(), event.getMember().getIdLong());
+        StarProfile profile = bot.starProfileManager.getProfile(event.getGuild().getIdLong(), event.getMember().getIdLong());
 
-        StarProfile profileVictim = bot.starProfileTable.get(event.getGuild().getIdLong(), other.getIdLong());
+        StarProfile profileVictim = bot.starProfileManager.getProfile(event.getGuild().getIdLong(), other.getIdLong());
 
         double r = ((double) random.nextInt(10)) / 100.0;
 
@@ -47,8 +50,8 @@ if (event.getMember().getIdLong() == other.getIdLong()) return;
 
         int toSteal = (int) (profileVictim.getStars() * r);
 
-        profileVictim.addStars(toSteal * -1);
-        profile.addStars(toSteal);
+        bot.starProfileManager.addStars(profileVictim, toSteal * -1);
+        bot.starProfileManager.addStars(profile, toSteal);
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setAuthor(event.getMember().getUser().getName(), null, event.getMember().getUser().getAvatarUrl())

@@ -5,11 +5,18 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Data
 @Entity
 @NoArgsConstructor
 @Table(name = "StarProfile")
 public class StarProfile {
+    @Transient
+    private long timestamp;
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -36,6 +43,8 @@ public class StarProfile {
         this.shares = shares;
         if (pickaxeCount != null) this.pickaxeCount = pickaxeCount;
         if (pickaxeCount == null) this.pickaxeCount = 0;
+
+        this.timestamp = System.currentTimeMillis();
     }
 
     public static StarProfileTable getTable() {
@@ -44,6 +53,12 @@ public class StarProfile {
 
     public void addStars(int amount) {
         this.stars += amount;
+        if (this.stars < 0) this.stars = 0;
         getTable().update(this);
+    }
+
+    public boolean isExpired(long ttl) {
+        // is expired after 20min
+        return System.currentTimeMillis() - timestamp > ttl;
     }
 }
