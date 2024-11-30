@@ -21,6 +21,7 @@ import java.util.Random;
 
 @ApplicationCommand(name = "rob", description = "Rob other Users!")
 public class RobCommand {
+if (event.getMember().getIdLong() == other.getIdLong()) return;
     static Map<String, Instant> cooldowns = new HashMap<>();
     Random random = new Random();
     Duration cooldownDuration = Duration.ofHours(6);
