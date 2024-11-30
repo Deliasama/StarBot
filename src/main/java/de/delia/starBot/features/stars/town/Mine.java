@@ -149,19 +149,19 @@ public class Mine extends Building {
                 return """
                         :pick: Daily pickaxes: **0 + 5 -> 5**
                         :hole: Max depth: **0 + 20 -> 20**
-                        :pick: Max pickaxes: **5 + 5 -> 10**
+                        :pick: Max pickaxes: **5 + 6 -> 11**
                         """;
             case 1:
                 return """
                         :pick: Daily pickaxes: **5 + 3 -> 8**
                         :hole: Max depth: **20 + 20 -> 40**
-                        :pick: Max pickaxes: **10 + 5 -> 15**
+                        :pick: Max pickaxes: **11 + 6 -> 17**
                         """;
             case 2:
                 return """
                         :pick: Daily pickaxes: **8 + 3 -> 11**
                         :hole: Max depth: **40 + 20 -> 60**
-                        :pick: Max pickaxes: **15 + 5 -> 20**
+                        :pick: Max pickaxes: **17 + 6 -> 23**
                         """;
         }
         return "coming soon!";
@@ -259,8 +259,8 @@ public class Mine extends Building {
         COAL(2, 10, "<:coal:1055867114428313600>", 0, 15, 50, 0.1d, 0.5d, 10),
         IRON(3, 20, "<:iron:1055867132384133210>", 5, 25, 100, 0.1d, 0.4d, 15),
         GOLD(4, 30, "<:gold:1055867149379452978>", 25, 50, 150, 0.01d, 0.2d, 20),
-        DIAMOND(4, 50, "<:dia:1055867170128658526>", 30, 75, 500, 0.005d, 0.1d, 30),
-        EMERALD(5, 75, "<:dia:1055867170128658526>", 40, 100, 500, 0.001d, 0.1d, 40),
+        DIAMOND(5, 50, "<:dia:1055867170128658526>", 30, 75, 500, 0.005d, 0.1d, 30),
+        EMERALD(6, 75, "<:dia:1055867170128658526>", 40, 100, 500, 0.001d, 0.1d, 40),
         ;
 
         final int id;
