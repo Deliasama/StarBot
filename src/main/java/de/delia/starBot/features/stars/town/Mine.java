@@ -38,7 +38,8 @@ public class Mine extends Building {
         super(4, "Mine", Emoji.fromFormatted(":hammer_pick:"), entity.getGuildId(), entity.getMemberId(), entity.getLevel(), entity.getMetadata(), Map.of(
                 1, new Integer[]{3, 300},
                 2, new Integer[]{3, 500},
-                3, new Integer[]{4, 800}
+                3, new Integer[]{4, 1000},
+                4, new Integer[]{5, 2500}
         ));
         if (objectMapper == null) this.objectMapper = new ObjectMapper();
     }
@@ -208,6 +209,7 @@ public class Mine extends Building {
         throw new MineException("Unavailable Mine Location!");
     }
 
+    // shifts the mine one row down and generates a new row
     private void shiftMineUp(Ores[] newRow) {
         for (int y = MINE_HEIGHT - 1; y >= 0; y--) {
             for (int x = 0; x < MINE_WIDTH; x++) {

@@ -14,7 +14,10 @@ public class Telescope extends Building {
                 1, new Integer[]{2, 100},
                 2, new Integer[]{2, 175},
                 3, new Integer[]{3, 300},
-                4, new Integer[]{3, 500})
+                4, new Integer[]{3, 500},
+                5, new Integer[]{4, 800},
+                6, new Integer[]{4, 1200}
+                )
         );
     }
 

@@ -21,7 +21,8 @@ public class TownHall extends Building {
                 // 1. value: Building Level, 2. value: needed Townhall level, 3. value: price
                 2, new Integer[]{0, 100},
                 3, new Integer[]{0, 400},
-                4, new Integer[]{0, 1000}
+                4, new Integer[]{0, 1000},
+                5, new Integer[]{0, 4000}
         ));
     }
 
