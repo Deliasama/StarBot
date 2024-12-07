@@ -18,7 +18,7 @@ public class StarsCommand {
         User user = other == null ? event.getMember().getUser() : other;
 
         event.getGuild().retrieveMember(user).queue(member -> {
-            StarProfile profile = bot.starProfileManager.getProfile(event.getGuild().getIdLong(), event.getMember().getIdLong());
+            StarProfile profile = bot.starProfileManager.getProfile(member.getIdLong(), event.getMember().getIdLong());
 
             EmbedBuilder embedBuilder = new EmbedBuilder()
                     .setAuthor(member.getEffectiveName(), null, member.getUser().getAvatarUrl())
