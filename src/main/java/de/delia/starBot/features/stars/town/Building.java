@@ -129,9 +129,10 @@ public abstract class Building implements Comparable<Building> {
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setTitle(icon.getFormatted() + " " + name + " (lvl. " + level + ")")
                 .setColor(Color.cyan)
-                .setDescription(getDescription())
-                .addField(":arrow_double_up: Upgrade (" + upgradeRequirements.get(level + 1)[1] + " Stars)", getUpgradeText(), false);
-
+                .setDescription(getDescription());
+        if (upgradeRequirements.containsKey(level + 1)) {
+            embedBuilder.addField(":arrow_double_up: Upgrade (" + upgradeRequirements.get(level + 1)[1] + " Stars)", getUpgradeText(), false);
+        }
         return embedBuilder.build();
     }
 

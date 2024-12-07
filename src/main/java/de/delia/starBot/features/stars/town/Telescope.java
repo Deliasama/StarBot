@@ -48,6 +48,8 @@ public class Telescope extends Building {
             case 1 -> ":star: StarDrop-Multiplier: **1.5 + 0.5 -> 2.0**";
             case 2 -> ":star: StarDrop-Multiplier: **2.0 + 0.5 -> 2.5**";
             case 3 -> ":star: StarDrop-Multiplier: **2.5 + 0.5 -> 3.0**";
+            case 4 -> ":star: StarDrop-Multiplier: **3.0 + 0.5 -> 3.5**";
+            case 5 -> ":star: StarDrop-Multiplier: **3.5 + 0.5 -> 4.0**";
             default -> ":x:";
         };
     }

@@ -164,6 +164,12 @@ public class Mine extends Building {
                         :hole: Max depth: **40 + 20 -> 60**
                         :pick: Max pickaxes: **17 + 6 -> 23**
                         """;
+            case 3:
+                return """
+                        :pick: Daily pickaxes: **11 + 3 -> 14**
+                        :hole: Max depth: **60 + 20 -> 80**
+                        :pick: Max pickaxes: **23 + 6 -> 29**
+                        """;
         }
         return "coming soon!";
     }
