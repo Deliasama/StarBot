@@ -1,5 +1,6 @@
 package de.delia.starBot.features.stars.listeners;
 
+import de.delia.starBot.features.stars.StarProfileManager;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.features.stars.town.Building;
 import de.delia.starBot.features.stars.town.Telescope;
@@ -24,12 +25,12 @@ public class VoiceStarsListeners extends ListenerAdapter {
         event.getJDA().getVoiceChannels().forEach(this::updateVoice);
 
         Main.scheduler.scheduleAtFixedRate(() -> membersInVoice.forEach((m, g) -> {
-            StarProfile starProfile = StarProfile.getTable().get(g, m);
+            StarProfile starProfile = Main.INSTANCE.starProfileManager.getProfile(g, m);
             Telescope telescope = (Telescope) Building.loadBuilding(Telescope.class, g, m);
             double multiplier = 1.0;
             if (telescope != null) multiplier += ((double) telescope.getLevel() * 0.5);
 
-            starProfile.addStars((int) Math.round(multiplier));
+            Main.INSTANCE.starProfileManager.addStars(starProfile, (int) Math.round(multiplier));
 
             System.out.println("someone received stars from voice activity! ID: " + m);
         }), 0, 10, TimeUnit.MINUTES);
