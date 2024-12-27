@@ -79,11 +79,11 @@ public class MessageReceivedListener extends ListenerAdapter {
     }
 
     private void addStars(MessageReceivedEvent event) {
-        StarProfile starProfile = StarProfile.getTable().get(event.getGuild().getIdLong(), event.getMember().getIdLong());
+        StarProfile starProfile = Main.INSTANCE.starProfileManager.getProfile(event.getGuild().getIdLong(), event.getMember().getIdLong());
         Telescope telescope = (Telescope) Building.loadBuilding(Telescope.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
         double multiplier = 1;
         if (telescope != null) multiplier = 1.0 + (telescope.getLevel() * 0.5);
-        starProfile.addStars((int) (Math.round(multiplier)));
+        Main.INSTANCE.starProfileManager.addStars(starProfile, (int) (Math.round(multiplier)));
 
         chatTimeout.put(event.getGuild().getId() + event.getMember().getId(), Instant.now().getEpochSecond());
     }

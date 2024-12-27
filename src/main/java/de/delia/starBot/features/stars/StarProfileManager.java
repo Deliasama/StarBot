@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 public class StarProfileManager {
     public Map<String, StarProfile> cachedStarProfiles = new ConcurrentHashMap<>();
+
     private final long ttl = 60*60*1000;
 
     public StarProfileManager() {
@@ -18,7 +19,7 @@ public class StarProfileManager {
             for (StarProfile starProfile : cachedStarProfiles.values()) {
                 if (starProfile.isExpired(ttl)) cachedStarProfiles.remove(String.valueOf(starProfile.getGuildId()) + String.valueOf(starProfile.getMemberId()));
             }
-        }, 0, 20*60*1000, TimeUnit.MILLISECONDS);
+        }, 0, 10*60*1000, TimeUnit.MILLISECONDS);
     }
 
     public StarProfile getProfile(Long guildId, Long memberId) {
