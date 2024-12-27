@@ -197,10 +197,10 @@ public class Mine extends Building {
             throw new MineException("You don't have a pickaxe!");
         }
         // checks if the mined ore is on the surface or else check if air is next by
-        if (y != (MINE_HEIGHT - 1)) {
+        if (depth != MINE_HEIGHT || y != (MINE_HEIGHT - 1)) {
             List<Ores> neighbours = new ArrayList<>();
             if (y - 1 >= 0) neighbours.add(ores[x][y - 1]);
-            neighbours.add(ores[x][y + 1]);
+            if (y + 1 < MINE_HEIGHT) neighbours.add(ores[x][y + 1]);
             if (x - 1 >= 0) neighbours.add(ores[x - 1][y]);
             if (x + 1 < MINE_WIDTH) neighbours.add(ores[x + 1][y]);
             if (!neighbours.contains(Ores.AIR)) throw new MineException("Unreachable Ore!");
