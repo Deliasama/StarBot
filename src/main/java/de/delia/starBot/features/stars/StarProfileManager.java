@@ -11,11 +11,12 @@ import java.util.concurrent.TimeUnit;
 
 public class StarProfileManager {
     public Map<String, StarProfile> cachedStarProfiles = new ConcurrentHashMap<>();
+    private final long ttl = 60*60*1000;
 
     public StarProfileManager() {
         Main.scheduler.scheduleAtFixedRate(() -> {
             for (StarProfile starProfile : cachedStarProfiles.values()) {
-                if (starProfile.isExpired(60*60*1000)) cachedStarProfiles.remove(String.valueOf(starProfile.getGuildId()) + String.valueOf(starProfile.getMemberId()));
+                if (starProfile.isExpired(ttl)) cachedStarProfiles.remove(String.valueOf(starProfile.getGuildId()) + String.valueOf(starProfile.getMemberId()));
             }
         }, 0, 20*60*1000, TimeUnit.MILLISECONDS);
     }
@@ -24,7 +25,7 @@ public class StarProfileManager {
         String id = guildId.toString() + memberId.toString();
         StarProfile starProfile = cachedStarProfiles.get(id);
         if (starProfile != null) {
-            if (!starProfile.isExpired(60*60*1000)) {
+            if (!starProfile.isExpired(ttl)) {
                 return starProfile;
             }
             cachedStarProfiles.remove(id);
