@@ -2,6 +2,8 @@ package de.delia.starBot.features.stars.commands;
 
 import de.delia.starBot.commands.ApplicationCommand;
 import de.delia.starBot.commands.ApplicationCommandMethod;
+import de.delia.starBot.features.items.Item;
+import de.delia.starBot.features.items.ItemType;
 import de.delia.starBot.features.stars.tables.Daily;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.features.stars.town.Building;
@@ -46,12 +48,12 @@ public class DailyCommand {
             */
 
             // Pickaxes
+            Item pickaxe = starProfile.getItems().get(ItemType.PICKAXE);
+            if (pickaxe == null) return;
             Mine mine = (Mine) Building.loadBuilding(Mine.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
             int pickaxeCount = 0;
             if (mine != null && mine.getLevel() > 0) pickaxeCount = 2 + mine.getLevel()*3;
-            int maxPickaxeCount = 5;
-            if (mine != null && mine.getLevel() > 0) maxPickaxeCount += 6 * mine.getLevel();
-            if ((starProfile.getPickaxeCount() + pickaxeCount) > maxPickaxeCount) pickaxeCount = maxPickaxeCount - starProfile.getPickaxeCount();
+            if ((pickaxe.getAmount() + pickaxeCount) > pickaxe.getStackSize()) pickaxeCount = pickaxe.getStackSize() - pickaxe.getAmount();
 
             // Stars
             TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
@@ -63,7 +65,8 @@ public class DailyCommand {
             }
             int starsEarned = (10 * townHall.getLevel()) + ((daily.getStreak() - 1) * townHall.getLevel()); //+ dividendBonus;
             starProfile.setStars(starProfile.getStars() + starsEarned);
-            starProfile.setPickaxeCount(starProfile.getPickaxeCount() + pickaxeCount);
+            pickaxe.setAmount(pickaxe.getAmount() + pickaxeCount);
+            pickaxe.update();
             bot.starProfileManager.updateProfile(starProfile);
             Daily.getTable().update(daily);
 

@@ -1,5 +1,7 @@
 package de.delia.starBot.features.stars.tables;
 
+import de.delia.starBot.features.items.Item;
+import de.delia.starBot.features.items.ItemType;
 import de.delia.starBot.main.Main;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -11,11 +13,13 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @Entity
-@NoArgsConstructor
 @Table(name = "StarProfile")
 public class StarProfile {
     @Transient
     private long timestamp;
+
+    @Transient
+    private Map<ItemType, Item> items = new HashMap<>();
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +40,10 @@ public class StarProfile {
     @Column(nullable = false)
     private int pickaxeCount = 0;
 
+    public StarProfile() {
+        this.timestamp = System.currentTimeMillis();
+    }
+
     public StarProfile(long guildId, long memberId, int stars, int shares, Integer pickaxeCount) {
         this.guildId = guildId;
         this.memberId = memberId;
@@ -45,6 +53,16 @@ public class StarProfile {
         if (pickaxeCount == null) this.pickaxeCount = 0;
 
         this.timestamp = System.currentTimeMillis();
+
+        for (ItemType itemType : ItemType.values()) {
+            this.items.put(itemType, Item.getItem(Main.INSTANCE, guildId, memberId, itemType));
+
+            // Set pickaxes to the old amount, remove this in a few updates!!
+            if (this.items.get(ItemType.PICKAXE).getAmount() == 0 && itemType == ItemType.PICKAXE) {
+                this.items.get(ItemType.PICKAXE).setAmount(pickaxeCount);
+                this.items.get(ItemType.PICKAXE).update();
+            }
+        }
     }
 
     public static StarProfileTable getTable() {

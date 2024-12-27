@@ -6,6 +6,8 @@ import de.delia.starBot.features.basics.StatusCommand;
 import de.delia.starBot.features.birthday.BirthdayCommand;
 import de.delia.starBot.features.birthday.BirthdayManager;
 import de.delia.starBot.features.birthday.BirthdayTable;
+import de.delia.starBot.features.items.ItemEntity;
+import de.delia.starBot.features.items.commands.InventoryCommand;
 import de.delia.starBot.features.stars.StarProfileManager;
 import de.delia.starBot.features.stars.TradeManager;
 import de.delia.starBot.features.stars.commands.*;
@@ -47,6 +49,8 @@ public class Bot {
     public GuildConfig.GuildConfigTable guildConfigTable;
     public BirthdayTable birthdayTable;
     public BuildingEntity.BuildingTable buildingTable;
+
+    public ItemEntity.ItemTable itemTable;
 
     // Managers
     public BirthdayManager birthdayManager;
@@ -96,6 +100,8 @@ public class Bot {
         commandManager.registerCommand(TownCommand.class);
         commandManager.registerCommand(Visit.class);
 
+        commandManager.registerCommand(InventoryCommand.class);
+
         starProfileManager = new StarProfileManager();
 
         commandManager.registerCommand(BirthdayCommand.class);
@@ -126,6 +132,8 @@ public class Bot {
         stockHistoryTable = new StockHistory.StockHistoryTable();
         dividendTable = new Dividend.DividendTable();
         buildingTable = new BuildingEntity.BuildingTable();
+
+        itemTable = new ItemEntity.ItemTable();
 
         guildConfigTable = new GuildConfig.GuildConfigTable();
 

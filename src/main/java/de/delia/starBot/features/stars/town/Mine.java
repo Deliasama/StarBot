@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import de.delia.starBot.features.items.Item;
+import de.delia.starBot.features.items.ItemType;
 import de.delia.starBot.features.stars.tables.BuildingEntity;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.main.Main;
@@ -126,10 +128,18 @@ public class Mine extends Building {
     @Override
     public String getDescription() {
         StarProfile starProfile = Main.INSTANCE.starProfileManager.getProfile(getGuildId(), getMemberId());
+        Item pickaxe = starProfile.getItems().get(ItemType.PICKAXE);
+        if (pickaxe == null) return null;
+
+        if ((getLevel() * 6 + 5) != pickaxe.getStackSize()) {
+            pickaxe.setStackSize(getLevel() * 6 + 5);
+            starProfile.getItems().get(ItemType.PICKAXE).update();
+        }
+
         StringBuilder description = new StringBuilder();
 
         description.append(":hole: Depth: ").append(depth).append("/").append(getLevel() * 20).append("\n")
-                .append(":pick: Pickaxes: ").append(starProfile.getPickaxeCount()).append("/").append(getLevel() * 6 + 5).append("\n\n**Mine:**\n");
+                .append(":pick: Pickaxes: ").append(pickaxe.getAmount()).append("/").append(pickaxe.getStackSize()).append("\n\n**Mine:**\n");
         // Simple mine visualization with emoji
         for (int y = MINE_HEIGHT - 1; y >= 0; y--) {
             description.append(":number_" + (y+1) + ":");
@@ -181,7 +191,9 @@ public class Mine extends Building {
             throw new MineException("Invalid coordinates!");
         }
         StarProfile starProfile = Main.INSTANCE.starProfileManager.getProfile(getGuildId(), getMemberId());
-        if (starProfile.getPickaxeCount() <= 0) {
+        Item pickaxe = starProfile.getItems().get(ItemType.PICKAXE);
+        if (pickaxe == null) throw new MineException("Pickaxes could not be loaded! Please try again or contact a developer if this error persists!");
+        if (pickaxe.getAmount() <= 0) {
             throw new MineException("You don't have a pickaxe!");
         }
         // checks if the mined ore is on the surface or else check if air is next by
@@ -205,7 +217,8 @@ public class Mine extends Building {
                 depth++;
                 shiftMineUp(generateMineRow(depth));
             }
-            starProfile.setPickaxeCount(starProfile.getPickaxeCount() - 1);
+            pickaxe.setAmount(pickaxe.getAmount() - 1);
+            pickaxe.update();
             starProfile.setStars(starProfile.getStars() + ore.stars);
             Main.INSTANCE.starProfileManager.updateProfile(starProfile);
             save();
