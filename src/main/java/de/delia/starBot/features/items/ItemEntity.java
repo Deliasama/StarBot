@@ -48,7 +48,7 @@ public class ItemEntity {
                         .setParameter(3, itemId)
                         .getResultList();
                 if (itemEntities.isEmpty()) {
-                    return new ItemEntity(guildId, memberId, itemId, null, 0);
+                    return null;
                 }
                 return itemEntities.get(0);
             });

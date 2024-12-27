@@ -7,6 +7,7 @@ import de.delia.starBot.features.birthday.BirthdayCommand;
 import de.delia.starBot.features.birthday.BirthdayManager;
 import de.delia.starBot.features.birthday.BirthdayTable;
 import de.delia.starBot.features.items.ItemEntity;
+import de.delia.starBot.features.items.commands.InventoryCommand;
 import de.delia.starBot.features.stars.StarProfileManager;
 import de.delia.starBot.features.stars.TradeManager;
 import de.delia.starBot.features.stars.commands.*;
@@ -98,6 +99,8 @@ public class Bot {
         commandManager.registerCommand(TradeCommand.class);
         commandManager.registerCommand(TownCommand.class);
         commandManager.registerCommand(Visit.class);
+
+        commandManager.registerCommand(InventoryCommand.class);
 
         starProfileManager = new StarProfileManager();
 

@@ -3,6 +3,9 @@ package de.delia.starBot.features.items;
 import de.delia.starBot.main.Bot;
 import de.delia.starBot.main.Main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public interface Item {
     static Item getItem(Bot bot, long guildId, long memberId, ItemType itemType) {
         if (bot == null) return null;
@@ -20,12 +23,11 @@ public interface Item {
 
         final ItemEntity finalItemEntity = itemEntity;
 
-
         return new Item() {
             private ItemEntity entity = finalItemEntity;
             private final ItemType type = itemType;
-            private int amount;
-            private int stackSize;
+            private int amount = finalItemEntity.getAmount();
+            private int stackSize = finalItemEntity.getStackSize();
 
             @Override
             public void update() {
@@ -56,7 +58,7 @@ public interface Item {
 
             @Override
             public void setAmount(int amount) {
-                this.amount = amount;
+                this.amount = Math.min(amount, stackSize);
             }
 
             @Override

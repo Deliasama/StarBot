@@ -6,9 +6,9 @@ public enum ItemType {
     PICKAXE("pickaxe", "Pickaxe", ":pick:", 5);
 
     final String itemId;
-    final String name;
-    final String emoji;
-    final int defaultStackSize;
+    public final String name;
+    public final String emoji;
+    public final int defaultStackSize;
 
     ItemType(String itemId, String name, String emoji, int defaultStackSize) {
         this.itemId = itemId;
