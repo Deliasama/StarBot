@@ -13,7 +13,8 @@ public class TownHall extends Building {
     private static final Map<Class<? extends Building>, Integer> buildingUnlockTable = Map.of(
             Telescope.class, 2,
             Wall.class, 2,
-            Mine.class, 3
+            Mine.class, 3,
+            Bank.class, 4
     );
 
     public TownHall(BuildingEntity buildingEntity) {
@@ -63,7 +64,12 @@ public class TownHall extends Building {
                         :unlock: Unlocks:
                         > Mine""";
             case 3:
-                return ":gem: Daily reward: **30 + 10 -> 40**";
+                return """
+                        :gem: Daily reward: **30 + 10 -> 40**
+                        :unlock: Unlocks:
+                        > Bank""";
+            case 4:
+                return ":gem: Daily reward: **40 + 10 -> 50**";
         }
         return ":x:";
     }
