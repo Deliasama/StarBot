@@ -107,13 +107,14 @@ public abstract class Building implements Comparable<Building> {
             if (!(townHall.getLevel() >= upgradeRequirements.get(level + 1)[0])) {
                 throw new UpgradeFailedException("You need to upgrade your townhall for that!");
             }
-            StarProfile starProfile = StarProfile.getTable().get(guildId, memberId);
+            StarProfile starProfile = Main.INSTANCE.starProfileManager.getProfile(guildId, memberId);
             if (starProfile == null) return false;
             if (!(starProfile.getStars() >= upgradeRequirements.get(level + 1)[1])) {
                 throw new UpgradeFailedException("You don't have enough stars!");
             }
-            starProfile.addStars(upgradeRequirements.get(level + 1)[1] * -1);
-            Main.INSTANCE.starProfileTable.update(starProfile);
+            starProfile.setStars(starProfile.getStars() + (upgradeRequirements.get(level + 1)[1] * -1));
+            Main.INSTANCE.starProfileManager.updateProfile(starProfile);
+
             level++;
             save();
 
