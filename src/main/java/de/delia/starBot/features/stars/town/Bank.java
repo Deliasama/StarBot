@@ -106,6 +106,7 @@ public class Bank extends Building {
             if (starProfile == null) return;
             if (starProfile.getStars() < amount) {
                 event.reply("You don't have that many stars!").setEphemeral(true).queue();
+                return;
             }
             this.starsStored += amount;
             starProfile.setStars(starProfile.getStars() - amount);
