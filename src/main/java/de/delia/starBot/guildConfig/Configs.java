@@ -1,7 +1,6 @@
 package de.delia.starBot.guildConfig;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public enum Configs {
     ENABLE_STOCK("enableStock", Boolean.class, false),

@@ -5,11 +5,9 @@ import de.delia.starBot.features.items.ItemType;
 import de.delia.starBot.main.Main;
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Data
 @Entity

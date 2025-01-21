@@ -10,13 +10,13 @@ import java.util.Map;
 public class Telescope extends Building {
     public Telescope(BuildingEntity buildingEntity) {
         super(2, "Telescope", Emoji.fromFormatted(":telescope:"), buildingEntity.getGuildId(), buildingEntity.getMemberId(), buildingEntity.getLevel(), buildingEntity.getMetadata(), Map.of(
-                // 1. value: Building Level, 2. value: needed Townhall level, 3. value: price
-                1, new Integer[]{2, 100},
-                2, new Integer[]{2, 175},
-                3, new Integer[]{3, 300},
-                4, new Integer[]{3, 500},
-                5, new Integer[]{4, 800},
-                6, new Integer[]{4, 1200}
+                        // 1. value: Building Level, 2. value: needed Townhall level, 3. value: price
+                        1, new Integer[]{2, 100},
+                        2, new Integer[]{2, 175},
+                        3, new Integer[]{3, 300},
+                        4, new Integer[]{3, 500},
+                        5, new Integer[]{4, 800},
+                        6, new Integer[]{4, 1200}
                 )
         );
     }

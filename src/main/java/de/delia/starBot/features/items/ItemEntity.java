@@ -1,6 +1,5 @@
 package de.delia.starBot.features.items;
 
-import de.delia.starBot.features.stars.tables.Daily;
 import de.delia.starBot.main.Main;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -13,6 +12,12 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "Item")
 public class ItemEntity {
+    @Column
+    String itemId;
+    @Column
+    Integer stackSize;
+    @Column
+    int amount;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,12 +25,6 @@ public class ItemEntity {
     private Long guildId;
     @Column
     private Long memberId;
-    @Column
-    String itemId;
-    @Column
-    Integer stackSize;
-    @Column
-    int amount;
 
     public ItemEntity(Long guildId, Long memberId, String itemId, Integer stackSize, int amount) {
         this.guildId = guildId;

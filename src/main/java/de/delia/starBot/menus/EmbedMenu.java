@@ -39,8 +39,8 @@ public class EmbedMenu extends ListenerAdapter {
     @Setter
     private SelectMenu selectMenu = null;
     private Function<OpenEmbedMenuEvent, EmbedBuilder> embedFunction;
-    private List<Modal> modals = new ArrayList<>();
-    private Map<String, BiConsumer<ModalInteractionEvent, EmbedMenu>> modalEvents = new HashMap<>();
+    private final List<Modal> modals = new ArrayList<>();
+    private final Map<String, BiConsumer<ModalInteractionEvent, EmbedMenu>> modalEvents = new HashMap<>();
 
     public EmbedMenu(String name, EmbedMenu parent) {
         this.name = name;
@@ -130,7 +130,7 @@ public class EmbedMenu extends ListenerAdapter {
     }
 
     public Optional<Modal> getModal(String id) {
-        return modals.stream().filter(m -> m.getId().split(":")[m.getId().split(":").length-1].equals(id)).findAny();
+        return modals.stream().filter(m -> m.getId().split(":")[m.getId().split(":").length - 1].equals(id)).findAny();
     }
 
     public void addEventListener(JDA jda) {
@@ -248,7 +248,7 @@ public class EmbedMenu extends ListenerAdapter {
 
         for (Modal modal : menu.modals) {
             if (modal.getId().equals(modalId)) {
-                if(menu.modalEvents.containsKey(modal.getId())) {
+                if (menu.modalEvents.containsKey(modal.getId())) {
                     menu.modalEvents.get(modal.getId()).accept(event, menu);
                 }
             }

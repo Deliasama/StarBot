@@ -142,7 +142,7 @@ public class Mine extends Building {
                 .append(":pick: Pickaxes: ").append(pickaxe.getAmount()).append("/").append(pickaxe.getStackSize()).append("\n\n**Mine:**\n");
         // Simple mine visualization with emoji
         for (int y = MINE_HEIGHT - 1; y >= 0; y--) {
-            description.append(":number_" + (y+1) + ":");
+            description.append(":number_" + (y + 1) + ":");
             for (int x = 0; x < MINE_WIDTH; x++) {
                 description.append(ores[x][y].formatedEmoji);
             }
@@ -192,7 +192,8 @@ public class Mine extends Building {
         }
         StarProfile starProfile = Main.INSTANCE.starProfileManager.getProfile(getGuildId(), getMemberId());
         Item pickaxe = starProfile.getItems().get(ItemType.PICKAXE);
-        if (pickaxe == null) throw new MineException("Pickaxes could not be loaded! Please try again or contact a developer if this error persists!");
+        if (pickaxe == null)
+            throw new MineException("Pickaxes could not be loaded! Please try again or contact a developer if this error persists!");
         if (pickaxe.getAmount() <= 0) {
             throw new MineException("You don't have a pickaxe!");
         }

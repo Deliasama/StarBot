@@ -32,20 +32,19 @@ import java.util.concurrent.TimeUnit;
 
 public class TradeManager implements Runnable {
     private final long guildId;
+    private final int minOffer;
+    private final Random random = new Random();
     // 1 = Closed; 2 = Sell Phase; 3 = Auction phase
     @Getter
     private int phase;
     @Getter
-    private List<Long> membersSell;
+    private final List<Long> membersSell;
     @Getter
-    private Map<Long, Integer> membersOffer;
-    private final int minOffer;
+    private final Map<Long, Integer> membersOffer;
     @Getter
     private int offerValue;
     @Getter
-    private Long offerMemberId;
-
-    private final Random random = new Random();
+    private final Long offerMemberId;
 
     public TradeManager(Guild guild) {
         this.guildId = guild.getIdLong();

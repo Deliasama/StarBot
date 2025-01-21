@@ -10,10 +10,8 @@ import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.EntitySelectInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.LayoutComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.components.selections.EntitySelectMenu;
-import net.dv8tion.jda.api.interactions.components.selections.SelectMenu;
 import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
@@ -102,7 +100,7 @@ public class GuildConfigMenu extends EmbedMenu {
                         .setTitle("**StarDrops**")
                         .setColor(Color.CYAN)
                         .addField(((boolean) guildConfig.getConfig(Configs.ENABLE_STAR_DROP) ? ":green_circle:" : ":red_circle:") + " Enable StarDrops", "Enables Star Drops", false)
-                        .addField(":gear: Star Drop rarity:", (int) guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MIN) + "-" + (int) guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MAX) + " messages", false)
+                        .addField(":gear: Star Drop rarity:", guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MIN) + "-" + guildConfig.getConfig(Configs.STAR_DROP_MESSAGE_MAX) + " messages", false)
                         .addField(":gear: Blacklisted Channel", "Change this setting in the Dropdown below!", false)
                         .setFooter("Green = Enabled, Red = Disabled")
                         .setTimestamp(Instant.now());
@@ -158,7 +156,7 @@ public class GuildConfigMenu extends EmbedMenu {
                         int minStars = Integer.parseInt(e.getValue("minMessages").getAsString());
                         int maxStars = Integer.parseInt(e.getValue("maxMessages").getAsString());
 
-                        if (minStars <= 0 || maxStars <=0 || minStars > maxStars) {
+                        if (minStars <= 0 || maxStars <= 0 || minStars > maxStars) {
                             e.reply("Please check your inputs and try it again!").setEphemeral(true).queue();
                             return;
                         }
@@ -252,9 +250,9 @@ public class GuildConfigMenu extends EmbedMenu {
 
             Long channelId = (Long) guildConfig.getConfig(Configs.LOG_CHANNEL);
 
-            if(channelId != null) {
+            if (channelId != null) {
                 TextChannel channel = event.getGuild().getTextChannelById(channelId);
-                if(channel != null) {
+                if (channel != null) {
                     EntitySelectMenu.DefaultValue value = EntitySelectMenu.DefaultValue.channel(channelId);
                     setSelectMenu(((EntitySelectMenu) getSelectMenu()).createCopy().setDefaultValues(value).build());
                 }
@@ -310,9 +308,9 @@ public class GuildConfigMenu extends EmbedMenu {
 
             Long channelId = (Long) guildConfig.getConfig(Configs.BIRTHDAY_CHANNEL);
 
-            if(channelId != null) {
+            if (channelId != null) {
                 TextChannel channel = event.getGuild().getTextChannelById(channelId);
-                if(channel != null) {
+                if (channel != null) {
                     EntitySelectMenu.DefaultValue value = EntitySelectMenu.DefaultValue.channel(channelId);
                     setSelectMenu(((EntitySelectMenu) getSelectMenu()).createCopy().setDefaultValues(value).build());
                 }

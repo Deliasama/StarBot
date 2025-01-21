@@ -10,16 +10,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 public class StarProfileManager {
+    private final long ttl = 60 * 60 * 1000;
     public Map<String, StarProfile> cachedStarProfiles = new ConcurrentHashMap<>();
-
-    private final long ttl = 60*60*1000;
 
     public StarProfileManager() {
         Main.scheduler.scheduleAtFixedRate(() -> {
             for (StarProfile starProfile : cachedStarProfiles.values()) {
-                if (starProfile.isExpired(ttl)) cachedStarProfiles.remove(String.valueOf(starProfile.getGuildId()) + String.valueOf(starProfile.getMemberId()));
+                if (starProfile.isExpired(ttl))
+                    cachedStarProfiles.remove(String.valueOf(starProfile.getGuildId()) + starProfile.getMemberId());
             }
-        }, 0, 10*60*1000, TimeUnit.MILLISECONDS);
+        }, 0, 10 * 60 * 1000, TimeUnit.MILLISECONDS);
     }
 
     public StarProfile getProfile(Long guildId, Long memberId) {
@@ -53,7 +53,7 @@ public class StarProfileManager {
         sp.setTimestamp(starProfile.getTimestamp());
         sp.setItems(starProfile.getItems());
 
-        cachedStarProfiles.put(String.valueOf(starProfile.getGuildId()) + String.valueOf(starProfile.getMemberId()), sp);
+        cachedStarProfiles.put(String.valueOf(starProfile.getGuildId()) + starProfile.getMemberId(), sp);
         return sp;
     }
 

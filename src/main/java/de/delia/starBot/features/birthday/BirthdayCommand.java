@@ -2,28 +2,30 @@ package de.delia.starBot.features.birthday;
 
 import de.delia.starBot.commands.ApplicationCommand;
 import de.delia.starBot.commands.ApplicationCommandMethod;
-import de.delia.starBot.commands.ApplicationCommandPermission;
 import de.delia.starBot.commands.Option;
 import de.delia.starBot.main.Bot;
 import de.delia.starBot.main.DiscordLogging;
-import de.delia.starBot.main.Main;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.TimeFormat;
 
-import java.sql.Time;
-import java.util.*;
 import java.awt.*;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @ApplicationCommand(name = "birthday", description = "Set or delete your day of birth!")
 public class BirthdayCommand {
+    @ApplicationCommandMethod
+    public void onCommand(Bot bot, SlashCommandInteractionEvent event) {
+    }
+
     @ApplicationCommand(name = "set", description = "set your birthday!")
     public static class SetCommand {
 
@@ -49,13 +51,13 @@ public class BirthdayCommand {
             Birthday b = bot.birthdayTable.get(event.getGuild().getIdLong(), event.getUser().getIdLong());
 
             if (b.getTimesChanged() > 3) {
-               event.reply("You Changed your birthday to many times!").setEphemeral(true).queue();
-               return;
+                event.reply("You Changed your birthday to many times!").setEphemeral(true).queue();
+                return;
             }
             b.setBirthday(date);
             b.setTimesChanged(b.getTimesChanged() + 1);
             bot.birthdayTable.update(b);
-            event.reply("Birthday set to "+ TimeFormat.DATE_LONG.atInstant(date.atStartOfDay(ZoneId.systemDefault()).toInstant()) + "!").setEphemeral(true).queue();
+            event.reply("Birthday set to " + TimeFormat.DATE_LONG.atInstant(date.atStartOfDay(ZoneId.systemDefault()).toInstant()) + "!").setEphemeral(true).queue();
 
             // LOGGING
             bot.discordLogging.log(event.getGuild().getIdLong(), DiscordLogging.LoggingType.INFO, "Changed birthday",
@@ -103,7 +105,4 @@ public class BirthdayCommand {
             event.replyEmbeds(embed.build()).queue();
         }
     }
-
-    @ApplicationCommandMethod
-    public void onCommand(Bot bot, SlashCommandInteractionEvent event) {}
 }

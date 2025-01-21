@@ -1,15 +1,9 @@
 package de.delia.starBot.features.birthday;
 
 import de.delia.starBot.database.Table;
-import de.delia.starBot.features.stars.tables.Daily;
 import de.delia.starBot.main.Main;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityManagerFactory;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 public class BirthdayTable extends Table<Birthday> {

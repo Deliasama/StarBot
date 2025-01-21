@@ -3,12 +3,10 @@ package de.delia.starBot.features.birthday;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.jfree.data.time.Month;
 
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Date;
 
 @Data
 @Entity
@@ -32,7 +30,7 @@ public class Birthday {
     private int timesChanged;
 
     public Birthday(Long guildId, Long memberId, LocalDate birthday, int timesChanged) {
-        this.guildId= guildId;
+        this.guildId = guildId;
         this.memberId = memberId;
         this.birthday = birthday;
         this.timesChanged = timesChanged;

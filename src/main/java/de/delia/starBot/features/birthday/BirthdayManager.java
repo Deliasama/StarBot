@@ -1,6 +1,5 @@
 package de.delia.starBot.features.birthday;
 
-import de.delia.starBot.features.stars.menus.StarDropMenu;
 import de.delia.starBot.guildConfig.Configs;
 import de.delia.starBot.guildConfig.GuildConfig;
 import de.delia.starBot.main.Bot;
@@ -35,7 +34,7 @@ public class BirthdayManager {
                 Guild guild = bot.jda.getGuildById(guildId);
                 if (guild != null) {
                     GuildConfig config = GuildConfig.getGuildConfig(guildId);
-                    if(config != null) {
+                    if (config != null) {
                         Long birthdayChannelId = (Long) config.getConfig(Configs.BIRTHDAY_CHANNEL);
                         if (birthdayChannelId != null) {
                             TextChannel textChannel = guild.getTextChannelById(birthdayChannelId);

@@ -1,6 +1,5 @@
 package de.delia.starBot.features.stars.listeners;
 
-import de.delia.starBot.features.stars.StarProfileManager;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.features.stars.town.Building;
 import de.delia.starBot.features.stars.town.Telescope;

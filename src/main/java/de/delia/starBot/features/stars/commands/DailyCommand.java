@@ -52,8 +52,9 @@ public class DailyCommand {
             if (pickaxe == null) return;
             Mine mine = (Mine) Building.loadBuilding(Mine.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
             int pickaxeCount = 0;
-            if (mine != null && mine.getLevel() > 0) pickaxeCount = 2 + mine.getLevel()*3;
-            if ((pickaxe.getAmount() + pickaxeCount) > pickaxe.getStackSize()) pickaxeCount = pickaxe.getStackSize() - pickaxe.getAmount();
+            if (mine != null && mine.getLevel() > 0) pickaxeCount = 2 + mine.getLevel() * 3;
+            if ((pickaxe.getAmount() + pickaxeCount) > pickaxe.getStackSize())
+                pickaxeCount = pickaxe.getStackSize() - pickaxe.getAmount();
 
             // Stars
             TownHall townHall = (TownHall) Building.loadBuilding(TownHall.class, event.getGuild().getIdLong(), event.getMember().getIdLong());
@@ -72,7 +73,8 @@ public class DailyCommand {
 
             StringBuilder description = new StringBuilder();
             description.append("You earned **").append(starsEarned).append("** Stars!\n").append("Streak: **").append(daily.getStreak() - 1).append("** :fire:");
-            if (pickaxeCount != 0) description.append("\nPickaxes received: **").append(pickaxeCount).append("** :pick:");
+            if (pickaxeCount != 0)
+                description.append("\nPickaxes received: **").append(pickaxeCount).append("** :pick:");
 
 
             EmbedBuilder embedBuilder = new EmbedBuilder()

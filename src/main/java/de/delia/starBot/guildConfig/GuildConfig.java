@@ -7,7 +7,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -116,7 +115,9 @@ public class GuildConfig {
         configs.put(key, value);
     }
 
-    public void setConfig(Configs config, String value) { configs.put(config.id, value); }
+    public void setConfig(Configs config, String value) {
+        configs.put(config.id, value);
+    }
 
     public GuildConfig update() {
         return Main.INSTANCE.guildConfigTable.update(this);

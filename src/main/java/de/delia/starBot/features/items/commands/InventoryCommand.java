@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Map;
 
 @ApplicationCommand(name = "inventory", description = "Open your Inventory!")
@@ -23,14 +22,13 @@ public class InventoryCommand {
 
         Map<ItemType, Item> items = starProfile.getItems();
 
-        StringBuilder mineItems = new StringBuilder();
-        mineItems.append(ItemType.PICKAXE.emoji).append(" ").append(ItemType.PICKAXE.name).append(": **").append(items.get(ItemType.PICKAXE).getAmount()).append("/").append(items.get(ItemType.PICKAXE).getStackSize()).append("**\n");
-        mineItems.append("\n(More is coming soon!)");
+        String mineItems = ItemType.PICKAXE.emoji + " " + ItemType.PICKAXE.name + ": **" + items.get(ItemType.PICKAXE).getAmount() + "/" + items.get(ItemType.PICKAXE).getStackSize() + "**\n" +
+                "\n(More is coming soon!)";
 
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setAuthor(event.getMember().getUser().getName(), null, event.getMember().getUser().getAvatarUrl())
                 .setTitle("Inventory")
-                .addField("Mine Items:", mineItems.toString(), false)
+                .addField("Mine Items:", mineItems, false)
                 .setTimestamp(Instant.now());
 
         event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();

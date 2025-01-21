@@ -1,10 +1,6 @@
 package de.delia.starBot.features.items;
 
 import de.delia.starBot.main.Bot;
-import de.delia.starBot.main.Main;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public interface Item {
     static Item getItem(Bot bot, long guildId, long memberId, ItemType itemType) {
@@ -24,8 +20,8 @@ public interface Item {
         final ItemEntity finalItemEntity = itemEntity;
 
         return new Item() {
-            private ItemEntity entity = finalItemEntity;
             private final ItemType type = itemType;
+            private ItemEntity entity = finalItemEntity;
             private int amount = finalItemEntity.getAmount();
             private int stackSize = finalItemEntity.getStackSize();
 
@@ -84,13 +80,22 @@ public interface Item {
     }
 
     void update();
+
     void use();
+
     boolean canUse();
+
     ItemType getItemType();
+
     int getAmount();
+
     void setAmount(int amount);
+
     int getStackSize();
+
     void setStackSize(int stackSize);
+
     String getName();
+
     String getEmoji();
 }
