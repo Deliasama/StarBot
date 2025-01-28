@@ -16,7 +16,9 @@ public class Telescope extends Building {
                         3, new Integer[]{3, 300},
                         4, new Integer[]{3, 500},
                         5, new Integer[]{4, 800},
-                        6, new Integer[]{4, 1200}
+                        6, new Integer[]{4, 1200},
+                        7, new Integer[]{5, 2000},
+                        8, new Integer[]{5, 3000}
                 )
         );
     }
@@ -50,6 +52,8 @@ public class Telescope extends Building {
             case 3 -> ":star: StarDrop-Multiplier: **2.5 + 0.5 -> 3.0**";
             case 4 -> ":star: StarDrop-Multiplier: **3.0 + 0.5 -> 3.5**";
             case 5 -> ":star: StarDrop-Multiplier: **3.5 + 0.5 -> 4.0**";
+            case 6 -> ":star: StarDrop-Multiplier: **4.0 + 0.5 -> 4.5**";
+            case 7 -> ":star: StarDrop-Multiplier: **4.5 + 0.5 -> 5.0**";
             default -> ":x:";
         };
     }
