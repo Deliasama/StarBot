@@ -3,6 +3,7 @@ package de.delia.starBot.features.stars.menus;
 import de.delia.starBot.features.stars.tables.StarProfile;
 import de.delia.starBot.features.stars.town.Building;
 import de.delia.starBot.features.stars.town.Telescope;
+import de.delia.starBot.main.Main;
 import de.delia.starBot.menus.ButtonMenu;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
@@ -57,6 +58,7 @@ public class StarDropMenu extends ButtonMenu {
                 collected.put(event.getGuild().getIdLong(), false);
             });
 
+            Main.INSTANCE.starProfileManager.addStars(Main.INSTANCE.starProfileManager.getProfile(event.getGuild().getIdLong(), event.getMember().getIdLong()), starsEarned);
             StarProfile.getTable().get(event.getGuild().getIdLong(), event.getUser().getIdLong()).addStars(starsEarned);
 
 

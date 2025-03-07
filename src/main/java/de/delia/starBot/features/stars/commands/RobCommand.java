@@ -41,6 +41,8 @@ public class RobCommand {
 
         StarProfile profile = bot.starProfileManager.getProfile(event.getGuild().getIdLong(), event.getMember().getIdLong());
 
+        int getMaxAmount = profile.getStars() / 10;
+
         StarProfile profileVictim = bot.starProfileManager.getProfile(event.getGuild().getIdLong(), other.getIdLong());
 
         double r = ((double) random.nextInt(10)) / 100.0;
@@ -49,6 +51,7 @@ public class RobCommand {
         if (wall != null) r -= (((double) wall.getLevel()) * 0.005);
 
         int toSteal = (int) (profileVictim.getStars() * r);
+        toSteal = Math.min(toSteal, getMaxAmount);
 
         bot.starProfileManager.addStars(profileVictim, toSteal * -1);
         bot.starProfileManager.addStars(profile, toSteal);

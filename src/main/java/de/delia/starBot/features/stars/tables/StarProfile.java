@@ -54,12 +54,6 @@ public class StarProfile {
 
         for (ItemType itemType : ItemType.values()) {
             this.items.put(itemType, Item.getItem(Main.INSTANCE, guildId, memberId, itemType));
-
-            // Set pickaxes to the old amount, remove this in a few updates!!
-            if (this.items.get(ItemType.PICKAXE).getAmount() == 0 && itemType == ItemType.PICKAXE) {
-                this.items.get(ItemType.PICKAXE).setAmount(pickaxeCount);
-                this.items.get(ItemType.PICKAXE).update();
-            }
         }
     }
 
@@ -70,11 +64,15 @@ public class StarProfile {
     public void addStars(int amount) {
         this.stars += amount;
         if (this.stars < 0) this.stars = 0;
-        getTable().update(this);
+        // getTable().update(this);
     }
 
     public boolean isExpired(long ttl) {
         // is expired after 20min
         return System.currentTimeMillis() - timestamp > ttl;
+    }
+
+    public void update() {
+        Main.INSTANCE.starProfileManager.updateProfile(this);
     }
 }
