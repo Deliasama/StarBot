@@ -50,8 +50,13 @@ public class RobCommand {
         Wall wall = (Wall) Building.loadBuilding(Wall.class, event.getGuild().getIdLong(), other.getIdLong());
         if (wall != null) r -= (((double) wall.getLevel()) * 0.005);
 
-        int toSteal = (int) (profileVictim.getStars() * r);
-        toSteal = Math.min(toSteal, getMaxAmount);
+        int toSteal = 0;
+        if (r >= 0) {
+            toSteal = (int) (profileVictim.getStars() * r);
+            toSteal = Math.min(toSteal, getMaxAmount);
+        } else {
+            toSteal = (int) (profile.getStars() * r);
+        }
 
         bot.starProfileManager.addStars(profileVictim, toSteal * -1);
         bot.starProfileManager.addStars(profile, toSteal);

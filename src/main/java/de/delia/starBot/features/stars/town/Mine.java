@@ -23,6 +23,7 @@ import net.dv8tion.jda.api.interactions.modals.Modal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
 
 public class Mine extends Building {
     private static final Modal mineModal = Modal.create("embedMenu:town:buildings:Mine:mineModal", "Mine")
@@ -34,6 +35,9 @@ public class Mine extends Building {
     public Ores[][] ores;
     int depth;
     private ObjectMapper objectMapper;
+
+    private int lastMineLocationX = 0;
+    private int lastMineLocationY = 0;
 
 
     public Mine(BuildingEntity entity) {
@@ -90,11 +94,22 @@ public class Mine extends Building {
     @Override
     public ActionRow getActionRow() {
         return ActionRow.of(Button.secondary("embedMenu:town:buildings:Mine:mine", Emoji.fromUnicode("⛏️")),
-                Button.secondary("embedMenu:town:buildings:Mine:reset", Emoji.fromUnicode("\uD83D\uDD04")));
+                Button.secondary("embedMenu:town:buildings:Mine:reset", Emoji.fromUnicode("\uD83D\uDD04")),
+                Button.secondary("embedMenu:town:buildings:Mine:quickMine", Emoji.fromUnicode("\uD83D\uDEE0")));
     }
 
     public void onButtonInteraction(ButtonInteractionEvent buttonInteractionEvent, String id, EmbedMenu menu) {
         if (id.equals("mine")) buttonInteractionEvent.replyModal(mineModal).queue();
+        if (id.equals("quickMine")) {
+            try {
+                Ores minedOre = quickMine();
+                EmbedBuilder builder = EmbedBuilder.fromData(getEmbed().toData());
+                builder.setDescription("You mined **" + minedOre.name() + "** and received **" + minedOre.stars + "** Stars!\n\n" + getEmbed().getDescription());
+                buttonInteractionEvent.editMessageEmbeds(builder.build()).queue();
+            } catch (MineException e) {
+                buttonInteractionEvent.reply(e.getMessage()).setEphemeral(true).queue();
+            }
+        }
         if (id.equals("reset")) {
             if (getLevel() == 0) {
                 buttonInteractionEvent.reply("You need at least level 1!").setEphemeral(true).queue();
@@ -184,6 +199,17 @@ public class Mine extends Building {
         return "coming soon!";
     }
 
+    public Ores quickMine() throws MineException {
+        if (lastMineLocationX == 0 && lastMineLocationY == 0) {
+            throw new MineException("You have to mine at least once before you can use quick mine!");
+        }
+        try {
+            return mineOre(lastMineLocationX, lastMineLocationY-1);
+        } catch (MineException e) {
+            throw e;
+        }
+    }
+
     public Ores mineOre(int x, int y) throws MineException {
         if (getLevel() < 1) throw new MineException("You need at least level 1!");
         if (this.ores == null) generateMine();
@@ -223,6 +249,10 @@ public class Mine extends Building {
             starProfile.setStars(starProfile.getStars() + ore.stars);
             Main.INSTANCE.starProfileManager.updateProfile(starProfile);
             save();
+
+            lastMineLocationX = x;
+            lastMineLocationY = y;
+            if (y <= 1) lastMineLocationY = 2;
 
             return ore;
         }
