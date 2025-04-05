@@ -25,10 +25,16 @@ public class InventoryCommand {
         String mineItems = ItemType.PICKAXE.emoji + " " + ItemType.PICKAXE.name + ": **" + items.get(ItemType.PICKAXE).getAmount() + "/" + items.get(ItemType.PICKAXE).getStackSize() + "**\n" +
                 "\n(More is coming soon!)";
 
+        StringBuilder debugItems = new StringBuilder();
+        for (Map.Entry<ItemType, Item> entry : items.entrySet()) {
+            debugItems.append(entry.getValue().getEmoji()).append(" | ").append(entry.getValue().getAmount()).append(" | ").append(entry.getValue().getName()).append("\n");
+        }
+
         EmbedBuilder embedBuilder = new EmbedBuilder()
                 .setAuthor(event.getMember().getUser().getName(), null, event.getMember().getUser().getAvatarUrl())
                 .setTitle("Inventory")
                 .addField("Mine Items:", mineItems, false)
+                .addField("</> Debug:", debugItems.toString(), false)
                 .setTimestamp(Instant.now());
 
         event.replyEmbeds(embedBuilder.build()).setEphemeral(true).queue();

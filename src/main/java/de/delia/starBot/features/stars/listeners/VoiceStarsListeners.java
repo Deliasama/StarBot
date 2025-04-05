@@ -31,7 +31,7 @@ public class VoiceStarsListeners extends ListenerAdapter {
 
             Main.INSTANCE.starProfileManager.addStars(starProfile, (int) Math.round(multiplier));
 
-            System.out.println("someone received stars from voice activity! ID: " + m);
+            // System.out.println("someone received stars from voice activity! ID: " + m);
         }), 0, 10, TimeUnit.MINUTES);
     }
 

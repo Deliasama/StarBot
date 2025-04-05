@@ -14,4 +14,11 @@ public enum ItemType {
         this.emoji = emoji;
         this.defaultStackSize = defaultStackSize;
     }
+
+    public static ItemType getItemType(String itemId) {
+        for (ItemType itemType : ItemType.values()) {
+            if (itemType.itemId.equals(itemId)) return itemType;
+        }
+        return ItemType.PICKAXE;
+    }
 }

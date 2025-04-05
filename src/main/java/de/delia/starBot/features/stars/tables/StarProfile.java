@@ -52,9 +52,12 @@ public class StarProfile {
 
         this.timestamp = System.currentTimeMillis();
 
-        for (ItemType itemType : ItemType.values()) {
-            this.items.put(itemType, Item.getItem(Main.INSTANCE, guildId, memberId, itemType));
+        items = Item.getItems(Main.INSTANCE, guildId, memberId);
+
+        for (Item item : items.values()) {
+            System.out.println(item);
         }
+
     }
 
     public static StarProfileTable getTable() {

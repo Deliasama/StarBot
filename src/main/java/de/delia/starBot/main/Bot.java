@@ -14,6 +14,7 @@ import de.delia.starBot.features.stars.commands.*;
 import de.delia.starBot.features.stars.listeners.ButtonInteractionListener;
 import de.delia.starBot.features.stars.listeners.MessageReceivedListener;
 import de.delia.starBot.features.stars.listeners.VoiceStarsListeners;
+import de.delia.starBot.features.stars.menus.GazeMenu;
 import de.delia.starBot.features.stars.menus.StarDropMenu;
 import de.delia.starBot.features.stars.tables.*;
 import de.delia.starBot.guildConfig.ConfigCommand;
@@ -59,6 +60,7 @@ public class Bot {
 
     // Menus
     public StarDropMenu starDropMenu;
+    public GazeMenu gazeMenu;
 
     // Discord Logger
     public DiscordLogging discordLogging;
@@ -99,6 +101,7 @@ public class Bot {
         commandManager.registerCommand(TradeCommand.class);
         commandManager.registerCommand(TownCommand.class);
         commandManager.registerCommand(Visit.class);
+        commandManager.registerCommand(GazeCommand.class);
 
         commandManager.registerCommand(InventoryCommand.class);
 
@@ -108,6 +111,7 @@ public class Bot {
 
         jda.addEventListener(new MessageReceivedListener());
         starDropMenu = new StarDropMenu(jda);
+        gazeMenu = new GazeMenu(jda);
 
         jda.addEventListener(new SlashCommandInteractionListener());
         jda.addEventListener(new GuildReadyListener());
